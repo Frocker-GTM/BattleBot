@@ -318,10 +318,65 @@ Return structured competitive intelligence with source attribution.`,
       };
     }
 
+    // MODE 9: Create research job and trigger background function
+    if (mode === "create_research_job") {
+      const { createClient } = require('@supabase/supabase-js');
+      const supabase = createClient(
+        process.env.VITE_SUPABASE_URL,
+        process.env.SUPABASE_SERVICE_ROLE_KEY
+      );
+
+      // Generate a unique job ID
+      const job_id = `${mode}_${competitor}_${productName}_${Date.now()}`
+        .replace(/\s+/g, '_')
+        .toLowerCase();
+
+      // Create the job row in Supabase
+      const { error } = await supabase
+        .from('research_results')
+        .insert({
+          job_id,
+          mode: body.researchMode,
+          competitor,
+          product_name: productName,
+          status: 'pending'
+        });
+
+      if (error) {
+        return {
+          statusCode: 500,
+          body: JSON.stringify({ error: error.message })
+        };
+      }
+
+      // Trigger the background function
+      const bgUrl = `${process.env.URL}/.netlify/functions/research-background`;
+      fetch(bgUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          job_id,
+          mode: body.researchMode,
+          competitor,
+          productName
+        })
+      });
+
+      // Return immediately with the job ID
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          job_id,
+          status: 'pending',
+          message: `Research job created. Poll /research-status with job_id to check progress.`
+        })
+      };
+    }
+
     return {
       statusCode: 400,
       body: JSON.stringify({
-        error: "Invalid mode. Use: warmup_start, warmup_continue, resolve_taxonomy, research_g2, research_trustradius, research_gartner_peers, research_website, or competitor_overview"
+        error: "Invalid mode. Use: warmup_start, warmup_continue, resolve_taxonomy, research_g2, research_trustradius, research_gartner_peers, research_website, create_research_job, or competitor_overview"
       })
     };
 
