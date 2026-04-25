@@ -58,7 +58,8 @@ exports.handler = async function(event, context) {
         .select('state')
         .eq('session_id', sessionId)
         .single();
-      if (error || !data) return null;
+      if (error) throw new Error(`Session load failed: ${JSON.stringify(error)}`);
+      if (!data) throw new Error(`Session not found: ${sessionId}`);
       return JSON.parse(data.state);
     }
 
