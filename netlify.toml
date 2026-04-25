@@ -1,2 +1,5 @@
+[functions]
+  timeout = 120
+
 [functions.battlecard]
   timeout = 120
