@@ -349,9 +349,9 @@ Return structured competitive intelligence with source attribution.`,
         };
       }
 
-      // Trigger the background function
+      // Trigger the background function with await
       const bgUrl = `${process.env.URL}/.netlify/functions/research-background`;
-      fetch(bgUrl, {
+      await fetch(bgUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
