@@ -588,10 +588,4 @@ Return as JSON array. Maximum 5 candidates. Strongest signals first.`;
       })
     };
   }
-Save, commit and push:
-cd C:\Users\bryan\my-job-site
-git add .
-git commit -m "return errors as 200 for debugging"
-git push
-Wait for Published, then run the image test again in PowerShell. This time instead of a 500 error it'll return the actual error message in the response. Let me know what you get!
 };
