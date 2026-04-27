@@ -420,7 +420,7 @@ exports.handler = async function(event, context) {
         battlecardId = existingCard.id;
       } else {
         // Create new battlecard
-        const { data: newCard } = await supabase
+        const { data: newCard, error: insertCardError } = await supabase
           .from('battlecards')
           .insert({
             product_id: productId,
@@ -431,6 +431,10 @@ exports.handler = async function(event, context) {
           })
           .select()
           .single();
+
+        if (insertCardError || !newCard) {
+          throw new Error(`Failed to create battlecard: ${JSON.stringify(insertCardError)}`);
+        }
 
         // Save first version
         await supabase.from('battlecard_versions').insert({
