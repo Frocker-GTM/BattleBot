@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Battlecard Viewer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;500;600;700&family=Lato:wght@400;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0D0F1A;
+    --bg-raised: #151829;
+    --bg-panel: #1A1F35;
+    --bg-sunken: #0A0C15;
+    --text: #DDE4F0;
+    --text-dim: #8A94AC;
+    --text-faint: #5A6275;
+    --rule: #232842;
+    --rule-strong: #313758;
+    --sapphire-abyss: #0A1F3D;
+    --sapphire-deep: #1A4F8A;
+    --sapphire: #2D7DD2;
+    --sapphire-sky: #5FA8E8;
+    --sapphire-ice: #B8D9F7;
+    --amethyst-void: #1A0F33;
+    --amethyst-deep: #5B3AAD;
+    --amethyst: #8B5CF6;
+    --amethyst-lav: #B794FA;
+    --amethyst-mist: #E4D9FD;
+    --amber-ember: #3D1F00;
+    --amber-burnt: #A35A0A;
+    --amber: #E8A020;
+    --amber-gold: #F2C46D;
+    --amber-cream: #FAE8C0;
+    --slate: #4B6584;
+    --tab1: var(--sapphire);
+    --tab1-deep: var(--sapphire-deep);
+    --tab1-tint: rgba(45,125,210,0.10);
+    --tab2: var(--amethyst);
+    --tab2-deep: var(--amethyst-deep);
+    --tab2-tint: rgba(139,92,246,0.10);
+    --tab3: var(--amber);
+    --tab3-deep: var(--amber-burnt);
+    --tab3-tint: rgba(232,160,32,0.10);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+  body {
+    font-family: 'Lato', -apple-system, system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse 80% 50% at 15% -10%, rgba(45,125,210,0.07), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 100% 0%, rgba(139,92,246,0.06), transparent 60%),
+      var(--bg);
+  }
+  h1,h2,h3,h4 { font-family: 'Josefin Sans', sans-serif; font-weight: 500; letter-spacing: 0.02em; margin: 0; line-height: 1.2; }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  .shell { max-width: 1160px; margin: 0 auto; padding: 36px 40px 80px; }
+
+  /* Loading state */
+  .loading {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 60vh; flex-direction: column; gap: 16px;
+    color: var(--text-dim); font-family: 'Josefin Sans', sans-serif;
+    letter-spacing: 0.1em; text-transform: uppercase; font-size: 13px;
+  }
+  .spinner {
+    width: 32px; height: 32px;
+    border: 2px solid var(--rule-strong);
+    border-top-color: var(--sapphire);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Masthead */
+  .mast {
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 24px; align-items: end;
+    padding-bottom: 24px; border-bottom: 1px solid var(--rule);
+  }
+  .mast .kicker {
+    font-family: 'Josefin Sans', sans-serif; font-weight: 600;
+    letter-spacing: 0.28em; text-transform: uppercase; font-size: 11px;
+    color: var(--amethyst-lav); display: flex; align-items: center; gap: 10px;
+    margin-bottom: 12px;
+  }
+  .mast .kicker .dot { width: 6px; height: 6px; background: var(--amber); border-radius: 50%; }
+  .mast h1 { font-size: 44px; font-weight: 300; letter-spacing: 0.01em; color: var(--text); }
+  .mast h1 .vs { color: var(--text-faint); font-weight: 300; margin: 0 10px; }
+  .mast h1 .them { color: var(--amber); }
+  .mast .sub { color: var(--text-dim); font-size: 14px; margin-top: 10px; max-width: 640px; }
+  .mast .meta { text-align: right; color: var(--text-dim); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; }
+  .mast .meta .row { display: flex; justify-content: flex-end; gap: 6px; margin-bottom: 4px; }
+  .mast .meta .label { color: var(--text-faint); }
+  .mast .meta .val { color: var(--text); font-weight: 500; }
+  .stale { display: inline-block; padding: 2px 8px; background: rgba(45,125,210,0.12); color: var(--sapphire-sky); border-radius: 2px; font-size: 10px; }
+
+  /* Tabs */
+  .tabs { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; margin-top: 28px; background: var(--rule); padding: 2px; border-radius: 3px; }
+  .tab { background: var(--bg-panel); padding: 16px 20px; cursor: pointer; border: 0; text-align: left; color: var(--text-dim); font-family: 'Josefin Sans', sans-serif; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; font-size: 12px; display: flex; align-items: center; gap: 12px; transition: color 120ms ease, background 120ms ease; border-radius: 2px; }
+  .tab:hover { color: var(--text); }
+  .tab .num { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-faint); font-weight: 400; letter-spacing: 0; }
+  .tab .title { font-size: 13px; }
+  .tab[aria-selected="true"] { background: var(--bg-raised); color: var(--text); box-shadow: inset 0 2px 0 0 var(--tab-accent, var(--sapphire)); }
+  .tab[data-tab="1"] { --tab-accent: var(--tab1); }
+  .tab[data-tab="2"] { --tab-accent: var(--tab2); }
+  .tab[data-tab="3"] { --tab-accent: var(--tab3); }
+  .tab[aria-selected="true"] .num { color: var(--tab-accent); }
+
+  /* Panels */
+  .panel { display: none; padding-top: 32px; }
+  .panel.active { display: block; }
+  .panel-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 22px; padding-bottom: 14px; border-bottom: 1px solid var(--rule); }
+  .panel-head h2 { font-size: 22px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; }
+  .panel-head .note { color: var(--text-faint); font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; font-family: 'JetBrains Mono', monospace; }
+
+  /* Cards */
+  .card { background: var(--bg-raised); border: 1px solid var(--rule); border-radius: 3px; margin-bottom: 18px; }
+  .card-head { padding: 14px 20px; border-bottom: 1px solid var(--rule); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .card-head h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-dim); font-weight: 600; }
+  .card-body { padding: 20px; }
+
+  /* Harvey balls */
+  .hball { display: inline-block; width: 18px; height: 18px; border-radius: 50%; border: 2px solid; vertical-align: middle; position: relative; overflow: hidden; }
+  .hball-0 { border-color: var(--text-faint); background: transparent; }
+  .hball-1 { border-color: var(--sapphire); background: linear-gradient(to right, var(--sapphire) 25%, transparent 25%); }
+  .hball-2 { border-color: var(--sapphire); background: linear-gradient(to right, var(--sapphire) 50%, transparent 50%); }
+  .hball-3 { border-color: var(--sapphire); background: linear-gradient(to right, var(--sapphire) 75%, transparent 75%); }
+  .hball-4 { border-color: var(--sapphire); background: var(--sapphire); }
+
+  /* Use case table */
+  .uc-table { width: 100%; border-collapse: collapse; }
+  .uc-table th { font-family: 'Josefin Sans', sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-faint); font-weight: 600; padding: 8px 12px; border-bottom: 1px solid var(--rule); text-align: left; }
+  .uc-table td { padding: 12px; border-bottom: 1px solid var(--rule); font-size: 14px; vertical-align: top; }
+  .uc-table tr:last-child td { border-bottom: none; }
+  .uc-table .uc-name { font-weight: 700; color: var(--text); }
+  .uc-table .uc-persona { color: var(--text-faint); font-size: 12px; margin-top: 2px; }
+  .uc-table .score-cell { text-align: center; }
+  .sub-row td { background: var(--bg-sunken); font-size: 13px; }
+  .sub-row .sub-name { padding-left: 28px; color: var(--text-dim); }
+
+  /* Tab 2 grid */
+  .t2-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .t2-grid .card { margin-bottom: 0; }
+  .overview-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--rule); font-size: 13px; }
+  .overview-row:last-child { border-bottom: none; }
+  .overview-row .ov-label { color: var(--text-faint); }
+  .overview-row .ov-val { color: var(--text); font-weight: 500; text-align: right; max-width: 60%; }
+  .placement-badge { display: inline-block; padding: 3px 10px; background: rgba(232,160,32,0.12); color: var(--amber-gold); border-radius: 2px; font-size: 12px; font-family: 'JetBrains Mono', monospace; margin-right: 6px; margin-bottom: 4px; }
+  .bullet-list { list-style: none; padding: 0; margin: 0; }
+  .bullet-list li { padding: 6px 0; border-bottom: 1px solid var(--rule); font-size: 13px; color: var(--text-dim); display: flex; gap: 8px; }
+  .bullet-list li:last-child { border-bottom: none; }
+  .bullet-list li::before { content: '—'; color: var(--text-faint); flex-shrink: 0; }
+  .rating-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--rule); }
+  .rating-row:last-child { border-bottom: none; }
+  .rating-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-faint); width: 100px; }
+  .rating-val { font-size: 15px; font-weight: 700; color: var(--text); }
+
+  /* SWOT */
+  .swot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--rule); border-radius: 3px; overflow: hidden; }
+  .swot-cell { background: var(--bg-raised); padding: 18px; }
+  .swot-cell h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 12px; font-weight: 600; }
+  .swot-cell.s h4 { color: var(--sapphire-sky); }
+  .swot-cell.w h4 { color: #F87171; }
+  .swot-cell.o h4 { color: #34D399; }
+  .swot-cell.t h4 { color: var(--amber-gold); }
+
+  /* FUD */
+  .fud-section { margin-bottom: 32px; }
+  .fud-section-head { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--rule-strong); }
+  .fud-section-head h3 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--text); font-weight: 600; }
+  .sect-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-faint); }
+  .fud-item { display: grid; grid-template-columns: 2fr 1.2fr 1.8fr; gap: 1px; background: var(--rule); margin-bottom: 2px; border-radius: 2px; overflow: hidden; }
+  .fud-cell { background: var(--bg-raised); padding: 16px 18px; font-size: 13px; }
+  .col-label { font-family: 'Josefin Sans', sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--text-faint); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .fud-cell p { margin: 0 0 8px; color: var(--text-dim); line-height: 1.5; }
+  .src { font-size: 11px; color: var(--text-faint); font-family: 'JetBrains Mono', monospace; }
+  .src a { color: var(--sapphire-sky); text-decoration: none; }
+  .priority-chip { display: inline-block; padding: 2px 7px; border-radius: 2px; font-size: 10px; font-family: 'JetBrains Mono', monospace; }
+  .p-high { background: rgba(45,125,210,0.15); color: var(--sapphire-sky); }
+  .p-med { background: rgba(139,92,246,0.15); color: var(--amethyst-lav); }
+  .p-low { background: rgba(232,160,32,0.12); color: var(--amber-gold); }
+
+  /* Footer */
+  .foot { border-top: 1px solid var(--rule); padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; color: var(--text-faint); font-size: 11px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.08em; max-width: 1160px; margin: 0 auto; }
+  .foot .fin { font-family: 'Josefin Sans', sans-serif; font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); }
+  .foot .fin .amber { color: var(--amber); }
+</style>
+</head>
+<body>
+
+<div id="loading" class="loading">
+  <div class="spinner"></div>
+  <div>Loading battlecard...</div>
+</div>
+
+<div id="battlecard" style="display:none">
+  <div class="shell">
+
+    <!-- MASTHEAD -->
+    <div class="mast">
+      <div>
+        <div class="kicker"><span class="dot"></span> Competitive Intelligence</div>
+        <h1>
+          <span id="our-product"></span>
+          <span class="vs">vs</span>
+          <span class="them" id="competitor-name"></span>
+        </h1>
+        <div class="sub" id="deck-subtitle"></div>
+      </div>
+      <div class="meta">
+        <div class="row"><span class="label">Published</span><span class="val" id="publish-date"></span></div>
+        <div class="row"><span class="label">Cadence</span><span class="val" id="refresh-cadence"></span></div>
+        <div class="row"><span class="label">Owner</span><span class="val" id="pmm-owner"></span></div>
+        <div class="row"><span class="stale" id="staleness"></span></div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab" data-tab="1" aria-selected="true">
+        <span class="num">01</span><span class="title">Use Cases</span>
+      </button>
+      <button class="tab" data-tab="2" aria-selected="false">
+        <span class="num">02</span><span class="title">Critical Intelligence</span>
+      </button>
+      <button class="tab" data-tab="3" aria-selected="false">
+        <span class="num">03</span><span class="title">FUD &amp; Discovery</span>
+      </button>
+    </div>
+
+    <!-- TAB 1: USE CASES -->
+    <div class="panel active" id="panel-1">
+      <div class="panel-head">
+        <h2><span style="display:inline-block;width:10px;height:10px;background:var(--sapphire);margin-right:12px;vertical-align:middle"></span>Use Cases</h2>
+        <span class="note">Harvey balls · 0–4 scale</span>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>Capability Comparison</h3></div>
+        <div class="card-body" style="padding:0">
+          <table class="uc-table">
+            <thead>
+              <tr>
+                <th style="width:45%">Use Case / Component</th>
+                <th style="width:15%">Persona</th>
+                <th class="score-cell" style="width:10%">Us</th>
+                <th class="score-cell" style="width:10%">Them</th>
+                <th style="width:20%">Rationale</th>
+              </tr>
+            </thead>
+            <tbody id="uc-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: CRITICAL INTELLIGENCE -->
+    <div class="panel" id="panel-2">
+      <div class="panel-head">
+        <h2><span style="display:inline-block;width:10px;height:10px;background:var(--amethyst);margin-right:12px;vertical-align:middle"></span>Critical Intelligence</h2>
+        <span class="note">Analyst · Reviews · SWOT</span>
+      </div>
+
+      <div class="t2-grid">
+        <div class="card">
+          <div class="card-head"><h3>Overview</h3></div>
+          <div class="card-body" id="overview-body"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Analyst Intelligence</h3></div>
+          <div class="card-body" id="analyst-body"></div>
+        </div>
+      </div>
+
+      <div class="t2-grid" style="margin-top:0">
+        <div class="card">
+          <div class="card-head"><h3>Customer Voice</h3></div>
+          <div class="card-body" id="customer-body"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>SWOT Analysis</h3></div>
+          <div class="card-body" style="padding:0">
+            <div class="swot-grid" id="swot-body"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: FUD -->
+    <div class="panel" id="panel-3">
+      <div class="panel-head">
+        <h2><span style="display:inline-block;width:10px;height:10px;background:var(--amber);margin-right:12px;vertical-align:middle"></span>FUD &amp; Discovery</h2>
+        <span class="note">Intelligence · Discovery · Response</span>
+      </div>
+      <div id="fud-body"></div>
+    </div>
+
+  </div>
+
+  <footer class="foot">
+    <div>BattleBot v1.0 · Agent-populated · Human-in-the-loop</div>
+    <div class="fin">FIN<span class="amber">.</span> Built for precision.</div>
+  </footer>
+</div>
+
+<script>
+(function(){
+
+  // ── Config ──────────────────────────────────────
+  const SUPABASE_URL = "https://twgxowiutlyzrsdgzlyf.supabase.co";
+  const SUPABASE_ANON = "sb_publishable_lcanvM3V8Kinja_fxUOooA_c2-syrdI";
+
+  // Get battlecard ID from URL param or use default
+  const params = new URLSearchParams(location.search);
+  const BATTLECARD_ID = params.get('id') || '613767a5-4a7e-4e09-a7bf-05dd29fff398';
+
+  // ── Supabase fetch ───────────────────────────────
+  async function fetchBattlecard(id) {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/battlecard_versions?battlecard_id=eq.${id}&order=version_number.desc&limit=1`,
+      { headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}` } }
+    );
+    const rows = await res.json();
+    return rows[0] || null;
+  }
+
+  // ── Harvey ball ──────────────────────────────────
+  function hball(score) {
+    const s = Math.min(4, Math.max(0, parseInt(score) || 0));
+    return `<span class="hball hball-${s}" title="${s}/4"></span>`;
+  }
+
+  // ── Render functions ─────────────────────────────
+  function renderHeader(h) {
+    document.getElementById('our-product').textContent = h.our_product_name || '';
+    document.getElementById('competitor-name').textContent = h.competitor_name || '';
+    document.getElementById('deck-subtitle').textContent = h.deck_subtitle || '';
+    document.getElementById('publish-date').textContent = h.publish_date || '';
+    document.getElementById('refresh-cadence').textContent = h.refresh_cadence || '';
+    document.getElementById('pmm-owner').textContent = h.pmm_owner || '';
+    document.getElementById('staleness').textContent = h.staleness || 'CURRENT';
+    document.title = `${h.our_product_name} vs ${h.competitor_name} — Battlecard`;
+  }
+
+  function renderUseCases(useCases) {
+    const tbody = document.getElementById('uc-tbody');
+    if (!useCases || !useCases.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="padding:20px;color:var(--text-faint)">No use cases available</td></tr>';
+      return;
+    }
+    let html = '';
+    useCases.forEach(uc => {
+      html += `<tr>
+        <td><div class="uc-name">${esc(uc.uc_name)}</div></td>
+        <td><div class="uc-persona">${esc(uc.uc_persona || '')}</div></td>
+        <td class="score-cell">${hball(uc.uc_our_score)}</td>
+        <td class="score-cell">${hball(uc.uc_their_score)}</td>
+        <td style="font-size:12px;color:var(--text-faint)">${esc(uc.uc_rationale || '').substring(0, 120)}${(uc.uc_rationale||'').length > 120 ? '…' : ''}</td>
+      </tr>`;
+      (uc.subcomponents || []).forEach(sub => {
+        html += `<tr class="sub-row">
+          <td class="sub-name">↳ ${esc(sub.sub_name)}</td>
+          <td></td>
+          <td class="score-cell">${hball(sub.our_score)}</td>
+          <td class="score-cell">${hball(sub.their_score)}</td>
+          <td style="font-size:12px;color:var(--text-faint)">${esc(sub.rationale || '').substring(0, 100)}${(sub.rationale||'').length > 100 ? '…' : ''}</td>
+        </tr>`;
+      });
+    });
+    tbody.innerHTML = html;
+  }
+
+  function renderTab2(tab2) {
+    // Overview
+    const ovBody = document.getElementById('overview-body');
+    ovBody.innerHTML = (tab2.overview || []).map(row => `
+      <div class="overview-row">
+        <span class="ov-label">${esc(row.label)}</span>
+        <span class="ov-val">${esc(row.value)}</span>
+      </div>`).join('');
+
+    // Analyst
+    const anBody = document.getElementById('analyst-body');
+    const an = tab2.analyst || {};
+    const placements = (an.placements || []).map(p =>
+      `<span class="placement-badge">${esc(p.label)} <span style="color:var(--text-faint);font-size:10px">${esc(p.source)}</span></span>`
+    ).join('');
+    const strengths = (an.strengths || []).map(s => `<li>${esc(s)}</li>`).join('');
+    const cautions = (an.cautions || []).map(c => `<li>${esc(c)}</li>`).join('');
+    anBody.innerHTML = `
+      <div style="margin-bottom:14px">${placements || '<span style="color:var(--text-faint)">No analyst data</span>'}</div>
+      <div style="margin-bottom:8px;font-size:11px;text-transform:uppercase;letter-spacing:0.15em;color:var(--sapphire-sky);font-family:Josefin Sans">Strengths</div>
+      <ul class="bullet-list">${strengths}</ul>
+      <div style="margin:12px 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:0.15em;color:#F87171;font-family:Josefin Sans">Cautions</div>
+      <ul class="bullet-list">${cautions}</ul>`;
+
+    // Customer
+    const custBody = document.getElementById('customer-body');
+    const cust = tab2.customer || {};
+    const ratings = (cust.ratings || []).map(r => `
+      <div class="rating-row">
+        <span class="rating-label">${esc(r.label)}</span>
+        <span class="rating-val">${esc(r.value)}</span>
+        ${r.n ? `<span style="color:var(--text-faint);font-size:11px">(${esc(r.n)})</span>` : ''}
+      </div>`).join('');
+    const praise = (cust.praise || []).map(p => `<li>${esc(p)}</li>`).join('');
+    const complaints = (cust.complaints || []).map(c => `<li>${esc(c)}</li>`).join('');
+    custBody.innerHTML = `
+      ${ratings ? `<div style="margin-bottom:14px">${ratings}</div>` : ''}
+      <div style="margin-bottom:8px;font-size:11px;text-transform:uppercase;letter-spacing:0.15em;color:#34D399;font-family:Josefin Sans">Praise Themes</div>
+      <ul class="bullet-list">${praise || '<li>See review research</li>'}</ul>
+      <div style="margin:12px 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:0.15em;color:#F87171;font-family:Josefin Sans">Complaint Themes</div>
+      <ul class="bullet-list">${complaints || '<li>See review research</li>'}</ul>`;
+
+    // SWOT
+    const swotBody = document.getElementById('swot-body');
+    const sw = tab2.swot || {};
+    const swotCells = [
+      { key: 'strengths', label: 'Strengths', cls: 's' },
+      { key: 'weaknesses', label: 'Weaknesses', cls: 'w' },
+      { key: 'opportunities', label: 'Opportunities', cls: 'o' },
+      { key: 'threats', label: 'Threats', cls: 't' }
+    ];
+    swotBody.innerHTML = swotCells.map(cell => `
+      <div class="swot-cell ${cell.cls}">
+        <h4>${cell.label}</h4>
+        <ul class="bullet-list">${(sw[cell.key] || []).map(b => `<li>${esc(b)}</li>`).join('')}</ul>
+      </div>`).join('');
+  }
+
+  function renderFUD(sections) {
+    const fudBody = document.getElementById('fud-body');
+    if (!sections || !sections.length) {
+      fudBody.innerHTML = '<div style="color:var(--text-faint);padding:20px">No FUD data available</div>';
+      return;
+    }
+    const priorityChip = (p, label) => {
+      const cls = p === 'high' ? 'p-high' : p === 'medium' ? 'p-med' : 'p-low';
+      return `<span class="priority-chip ${cls}">${esc(label || p)}</span>`;
+    };
+    let html = '';
+    sections.forEach((sec, si) => {
+      html += `<div class="fud-section">
+        <div class="fud-section-head">
+          <span class="sect-num">${String(si+1).padStart(2,'0')}</span>
+          <h3>${esc(sec.title)}</h3>
+        </div>`;
+      (sec.items || []).forEach(item => {
+        const sources = (item.intel_sources || []).map(s =>
+          `<a href="${s.href || '#'}">${esc(s.label)}</a>`).join(' · ');
+        html += `<div class="fud-item">
+          <div class="fud-cell">
+            <div class="col-label">Intelligence ${priorityChip(item.priority, item.priority_label)}</div>
+            <p>${esc(item.intelligence)}</p>
+            ${sources ? `<span class="src">Source: ${sources}</span>` : ''}
+          </div>
+          <div class="fud-cell">
+            <div class="col-label">Discovery Question</div>
+            <p>${esc(item.discovery_question)}</p>
+          </div>
+          <div class="fud-cell">
+            <div class="col-label">Recommended Response</div>
+            <p>${esc(item.recommended_response)}</p>
+          </div>
+        </div>`;
+      });
+      html += '</div>';
+    });
+    fudBody.innerHTML = html;
+  }
+
+  function esc(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+  }
+
+  // ── Tab switching ────────────────────────────────
+  function showTab(n) {
+    document.querySelectorAll('.tab').forEach(t =>
+      t.setAttribute('aria-selected', String(t.dataset.tab === n)));
+    ['1','2','3'].forEach(i => {
+      const p = document.getElementById(`panel-${i}`);
+      if (p) p.className = 'panel' + (i === n ? ' active' : '');
+    });
+  }
+  document.querySelectorAll('.tab').forEach(t =>
+    t.addEventListener('click', () => showTab(t.dataset.tab)));
+  document.addEventListener('keydown', e => {
+    if (e.target.closest('input,textarea')) return;
+    if (['1','2','3'].includes(e.key)) showTab(e.key);
+  });
+
+  // ── Main ─────────────────────────────────────────
+  async function main() {
+    try {
+      const version = await fetchBattlecard(BATTLECARD_ID);
+      if (!version) throw new Error('Battlecard not found');
+
+      const data = {
+        header: version.tab_critical_intelligence?.header ||
+          { our_product_name: 'BattleBot', competitor_name: 'Competitor', staleness: 'CURRENT' },
+        tab1_use_cases: version.tab_use_case || [],
+        tab2: version.tab_critical_intelligence || {},
+        tab3_fud_sections: version.tab_fud || []
+      };
+
+      // Fix header — it's stored in tab_critical_intelligence
+      // but we saved it at assembly time as part of battlecardData
+      // Load it from the full assembled data if available
+      renderHeader(data.header);
+      renderUseCases(data.tab1_use_cases);
+      renderTab2(data.tab2);
+      renderFUD(data.tab3_fud_sections);
+
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('battlecard').style.display = 'block';
+
+    } catch(err) {
+      document.getElementById('loading').innerHTML =
+        `<div style="color:#F87171">Error: ${err.message}</div>`;
+    }
+  }
+
+  main();
+})();
+</script>
+</body>
+</html>

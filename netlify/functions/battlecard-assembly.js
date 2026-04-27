@@ -441,7 +441,7 @@ exports.handler = async function(event, context) {
           battlecard_id: newCard.id,
           version_number: 1,
           tab_use_case: battlecardData.tab1_use_cases,
-          tab_critical_intelligence: battlecardData.tab2,
+          tab_critical_intelligence: { ...battlecardData.tab2, header: battlecardData.header },
           tab_fud: battlecardData.tab3_fud_sections,
           change_reason: changeReason || 'Initial battlecard creation',
           changed_by: userId || null,
