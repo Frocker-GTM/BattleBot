@@ -43,65 +43,91 @@
   </div>
 
   <script>
-    const API = "https://competitivebattlebot.netlify.app/.netlify/functions/fud-analysis";
+    const FUD_API = "https://competitivebattlebot.netlify.app/.netlify/functions/fud-analysis";
+    const STATUS_API = "https://competitivebattlebot.netlify.app/.netlify/functions/research-status";
     const PRODUCT_ID = "5dc3ec12-09dc-4fd7-8ff2-7fd3c8410313";
     const COMPETITOR_ID = "cbca546d-20fb-4463-843a-5d7aa654ae69";
 
+    let lastJobId = null;
     let lastAnalysisResult = null;
+    let pollInterval = null;
 
-    async function callAPI(body) {
-      document.getElementById('response').textContent = "Calling API... (this may take 20-30 seconds)";
-      try {
-        const res = await fetch(API, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
-        });
-        const data = await res.json();
-        document.getElementById('response').textContent =
-          data.message
-            ? data.message + "\n\n" + JSON.stringify(data, null, 2)
-            : JSON.stringify(data, null, 2);
-        return data;
-      } catch(err) {
-        document.getElementById('response').textContent = "Error: " + err.message;
-      }
+    function log(msg) {
+      document.getElementById('response').textContent = 
+        typeof msg === 'object' ? JSON.stringify(msg, null, 2) : msg;
+    }
+
+    async function callAPI(url, body) {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      return await res.json();
     }
 
     async function runAnalysis() {
-      const result = await callAPI({
-        mode: "run_analysis",
+      log("Creating FUD analysis job...");
+      const result = await callAPI(FUD_API, {
+        mode: "create_fud_job",
         productId: PRODUCT_ID,
         competitorId: COMPETITOR_ID
       });
-      if (result && result.fudCandidates) {
-        lastAnalysisResult = result;
-        document.getElementById('response').textContent +=
-          "\n\n✅ Analysis complete — click Approve and Save to write to database.";
+
+      if (result.job_id) {
+        lastJobId = result.job_id;
+        log(`Job created: ${result.job_id}\n\nPolling for results...`);
+        pollInterval = setInterval(pollStatus, 10000);
+      } else {
+        log(result);
+      }
+    }
+
+    async function pollStatus() {
+      if (!lastJobId) return;
+      const result = await callAPI(STATUS_API, { job_id: lastJobId });
+      log(`Status: ${result.status}\n\n${result.result ? 'Result received!' : 'Still running...'}`);
+
+      if (result.status === 'complete') {
+        clearInterval(pollInterval);
+        try {
+          const parsed = JSON.parse(result.result);
+          lastAnalysisResult = parsed;
+          log(`✅ FUD Analysis Complete!\n\nFUD Candidates: ${parsed.fud_candidates?.length || 0}\nCompetitive Overlaps: ${parsed.competitive_overlaps?.length || 0}\n\n${JSON.stringify(parsed, null, 2)}`);
+        } catch(e) {
+          log(result.result);
+        }
+      } else if (result.status === 'error') {
+        clearInterval(pollInterval);
+        log(`❌ Error: ${result.result}`);
       }
     }
 
     async function approveAndSave() {
       if (!lastAnalysisResult) {
-        alert("Please run the analysis first.");
+        alert("Please run the analysis first and wait for it to complete.");
         return;
       }
-      await callAPI({
+      log("Saving FUD candidates...");
+      const result = await callAPI(FUD_API, {
         mode: "approve_and_save",
         productId: PRODUCT_ID,
         competitorId: COMPETITOR_ID,
-        fudCandidates: lastAnalysisResult.fudCandidates,
-        competitiveOverlaps: lastAnalysisResult.competitiveOverlaps,
+        fudCandidates: lastAnalysisResult.fud_candidates,
+        competitiveOverlaps: lastAnalysisResult.competitive_overlaps,
         changeReason: "Initial FUD analysis"
       });
+      log(result.message || JSON.stringify(result, null, 2));
     }
 
     async function getFUD() {
-      await callAPI({
+      log("Loading saved FUD candidates...");
+      const result = await callAPI(FUD_API, {
         mode: "get_fud_for_competitor",
         productId: PRODUCT_ID,
         competitorId: COMPETITOR_ID
       });
+      log(JSON.stringify(result, null, 2));
     }
   </script>
 </body>

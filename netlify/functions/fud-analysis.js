@@ -462,8 +462,38 @@ Produce the FUD analysis JSON now.`;
       });
     }
 
+    // ─────────────────────────────────────────────
+    // MODE: create_fud_job
+    // Creates async job and triggers background function
+    // ─────────────────────────────────────────────
+    if (mode === "create_fud_job") {
+      const job_id = `fud_${competitorId}_${Date.now()}`;
+
+      // Create job row
+      await supabase.from('research_results').insert({
+        job_id,
+        mode: 'fud_analysis',
+        competitor: competitorId,
+        product_name: productId,
+        status: 'pending'
+      });
+
+      // Trigger background function
+      await fetch(`${process.env.URL}/.netlify/functions/fud-background`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ job_id, productId, competitorId })
+      });
+
+      return respond(200, {
+        job_id,
+        status: 'pending',
+        message: 'FUD analysis job created. Poll /research-status with job_id to check progress.'
+      });
+    }
+
     return respond(400, {
-      error: "Invalid mode. Use: run_analysis, approve_and_save, get_fud_for_competitor, update_proof_point"
+      error: "Invalid mode. Use: create_fud_job, approve_and_save, get_fud_for_competitor, update_proof_point"
     });
 
   } catch (error) {
