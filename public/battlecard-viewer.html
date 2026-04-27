@@ -311,22 +311,20 @@
 <script>
 (function(){
 
-  // ── Config ──────────────────────────────────────
-  const SUPABASE_URL = "https://twgxowiutlyzrsdgzlyf.supabase.co";
-  const SUPABASE_ANON = "sb_publishable_lcanvM3V8Kinja_fxUOooA_c2-syrdI";
-
   // Get battlecard ID from URL param or use default
   const params = new URLSearchParams(location.search);
   const BATTLECARD_ID = params.get('id') || '613767a5-4a7e-4e09-a7bf-05dd29fff398';
 
   // ── Supabase fetch ───────────────────────────────
+  const ASSEMBLY_API = "https://competitivebattlebot.netlify.app/.netlify/functions/battlecard-assembly";
+
   async function fetchBattlecard(id) {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/battlecard_versions?battlecard_id=eq.${id}&order=version_number.desc&limit=1`,
-      { headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}` } }
-    );
-    const rows = await res.json();
-    return rows[0] || null;
+    const res = await fetch(ASSEMBLY_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mode: "get_battlecard", battlecardId: id })
+    });
+    return await res.json();
   }
 
   // ── Harvey ball ──────────────────────────────────

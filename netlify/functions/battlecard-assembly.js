@@ -464,7 +464,34 @@ exports.handler = async function(event, context) {
         message: `Battlecard assembled for **${product.product_name} vs ${competitor.company_name} ${competitor.product_name}**.\n\nAll three tabs populated and saved to database.`
       });
     }
+// ─────────────────────────────────────────────
+    // MODE: get_battlecard
+    // Returns battlecard data for the viewer
+    // ─────────────────────────────────────────────
+    if (mode === "get_battlecard") {
+      const { battlecardId } = body;
 
+      const { data: version, error } = await supabase
+        .from('battlecard_versions')
+        .select('*')
+        .eq('battlecard_id', battlecardId)
+        .order('version_number', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error || !version) {
+        return respond(404, { error: "Battlecard not found" });
+      }
+
+      return respond(200, {
+        battlecardId,
+        versionNumber: version.version_number,
+        tab_use_case: version.tab_use_case,
+        tab_critical_intelligence: version.tab_critical_intelligence,
+        tab_fud: version.tab_fud,
+        changed_at: version.changed_at
+      });
+    }
     return respond(400, {
       error: "Invalid mode. Use: create_scoring_job, confirm_use_case_scores, create_swot_job, confirm_swot, assemble_battlecard"
     });
