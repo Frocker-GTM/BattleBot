@@ -400,7 +400,7 @@ exports.handler = async function(event, context) {
           battlecard_id: existingCard.id,
           version_number: existingCard.current_version,
           tab_use_case: battlecardData.tab1_use_cases,
-          tab_critical_intelligence: battlecardData.tab2,
+          tab_critical_intelligence: { ...battlecardData.tab2, header: battlecardData.header },
           tab_fud: battlecardData.tab3_fud_sections,
           change_reason: changeReason || 'Battlecard updated',
           changed_by: userId || null,
