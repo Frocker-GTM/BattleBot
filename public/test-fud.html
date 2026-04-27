@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>FUD Analysis Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 20px; }
+    button { background: #1E3A5F; color: white; padding: 10px 20px; border: none; cursor: pointer; margin: 5px; border-radius: 4px; }
+    button:hover { background: #2E6DA4; }
+    pre { background: #f0f0f0; padding: 15px; overflow-x: auto; white-space: pre-wrap; max-height: 600px; overflow-y: auto; }
+    .section { border: 1px solid #ccc; padding: 15px; margin: 15px 0; border-radius: 4px; }
+    .note { background: #FFF9DB; padding: 10px; border-left: 4px solid #885500; margin: 10px 0; font-size: 14px; }
+    h2 { color: #1E3A5F; }
+  </style>
+</head>
+<body>
+  <h1>FUD Gap Analysis Test</h1>
+  <div class="note">
+    Product ID: <strong>5dc3ec12-09dc-4fd7-8ff2-7fd3c8410313</strong> (BattleBot)<br>
+    Competitor ID: <strong>cbca546d-20fb-4463-843a-5d7aa654ae69</strong> (Cordial Edge)
+  </div>
+
+  <div class="section">
+    <h2>Step 1 — Run FUD Analysis</h2>
+    <p>Pulls all available intelligence from Supabase and produces ranked FUD candidates.</p>
+    <button onclick="runAnalysis()">Run FUD Analysis</button>
+  </div>
+
+  <div class="section">
+    <h2>Step 2 — Approve and Save</h2>
+    <p>After reviewing the candidates above, click to archive existing FUD and save new candidates.</p>
+    <button onclick="approveAndSave()">Approve and Save FUD Candidates</button>
+  </div>
+
+  <div class="section">
+    <h2>Step 3 — Retrieve Saved FUD</h2>
+    <p>Confirm the candidates were saved correctly.</p>
+    <button onclick="getFUD()">Get Saved FUD Candidates</button>
+  </div>
+
+  <div class="section">
+    <h2>Response</h2>
+    <pre id="response">Response will appear here...</pre>
+  </div>
+
+  <script>
+    const API = "https://competitivebattlebot.netlify.app/.netlify/functions/fud-analysis";
+    const PRODUCT_ID = "5dc3ec12-09dc-4fd7-8ff2-7fd3c8410313";
+    const COMPETITOR_ID = "cbca546d-20fb-4463-843a-5d7aa654ae69";
+
+    let lastAnalysisResult = null;
+
+    async function callAPI(body) {
+      document.getElementById('response').textContent = "Calling API... (this may take 20-30 seconds)";
+      try {
+        const res = await fetch(API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        document.getElementById('response').textContent =
+          data.message
+            ? data.message + "\n\n" + JSON.stringify(data, null, 2)
+            : JSON.stringify(data, null, 2);
+        return data;
+      } catch(err) {
+        document.getElementById('response').textContent = "Error: " + err.message;
+      }
+    }
+
+    async function runAnalysis() {
+      const result = await callAPI({
+        mode: "run_analysis",
+        productId: PRODUCT_ID,
+        competitorId: COMPETITOR_ID
+      });
+      if (result && result.fudCandidates) {
+        lastAnalysisResult = result;
+        document.getElementById('response').textContent +=
+          "\n\n✅ Analysis complete — click Approve and Save to write to database.";
+      }
+    }
+
+    async function approveAndSave() {
+      if (!lastAnalysisResult) {
+        alert("Please run the analysis first.");
+        return;
+      }
+      await callAPI({
+        mode: "approve_and_save",
+        productId: PRODUCT_ID,
+        competitorId: COMPETITOR_ID,
+        fudCandidates: lastAnalysisResult.fudCandidates,
+        competitiveOverlaps: lastAnalysisResult.competitiveOverlaps,
+        changeReason: "Initial FUD analysis"
+      });
+    }
+
+    async function getFUD() {
+      await callAPI({
+        mode: "get_fud_for_competitor",
+        productId: PRODUCT_ID,
+        competitorId: COMPETITOR_ID
+      });
+    }
+  </script>
+</body>
+</html>
