@@ -330,7 +330,9 @@ exports.handler = async function(event, context) {
       const battlecardData = {
         header: {
           our_product_name: product.product_name,
-          competitor_name: `${competitor.company_name} ${competitor.product_name}`,
+          competitor_name: competitor.product_name.toLowerCase().includes(competitor.company_name.toLowerCase())
+            ? competitor.product_name
+            : `${competitor.company_name} ${competitor.product_name}`,
           deck_subtitle: `Competitive intelligence for ${competitor.company_name} ${competitor.product_name} deals`,
           publish_date: new Date().toISOString().split('T')[0],
           refresh_cadence: 'Monthly',
