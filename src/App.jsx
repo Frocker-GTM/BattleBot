@@ -1,122 +1,65 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { supabase } from './lib/supabase.js'
 
-function App() {
-  const [count, setCount] = useState(0)
+// Site screens
+import Home from './screens/site/Home.jsx'
+import About from './screens/site/About.jsx'
+import AppGateway from './screens/site/AppGateway.jsx'
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+// App screens
+import Login from './screens/app/Login.jsx'
+import Signup from './screens/app/Signup.jsx'
+import Dashboard from './screens/app/Dashboard.jsx'
+import Warmup from './screens/app/Warmup.jsx'
+import Research from './screens/app/Research.jsx'
+import Analyst from './screens/app/Analyst.jsx'
+import Fud from './screens/app/Fud.jsx'
+import Assembly from './screens/app/Assembly.jsx'
+import Viewer from './screens/app/Viewer.jsx'
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+// Protected route wrapper
+function Protected({ session, children }) {
+  if (session === null) return <Navigate to="/login" replace />
+  if (session === undefined) return null // still loading
+  return children
 }
 
-export default App
+export default function App() {
+  const [session, setSession] = useState(undefined)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session ?? null)
+    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session ?? null)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
+  return (
+    <Routes>
+      {/* Public site */}
+      <Route path="/" element={<Home />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/app" element={<AppGateway />} />
+
+      {/* Auth */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+
+      {/* Protected app */}
+      <Route path="/dashboard" element={<Protected session={session}><Dashboard /></Protected>} />
+      <Route path="/warmup" element={<Protected session={session}><Warmup /></Protected>} />
+      <Route path="/research/:productId" element={<Protected session={session}><Research /></Protected>} />
+      <Route path="/analyst/:productId" element={<Protected session={session}><Analyst /></Protected>} />
+      <Route path="/fud/:productId/:competitorId" element={<Protected session={session}><Fud /></Protected>} />
+      <Route path="/assembly/:productId/:competitorId" element={<Protected session={session}><Assembly /></Protected>} />
+      <Route path="/battlecard/:battlecardId" element={<Protected session={session}><Viewer /></Protected>} />
+
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  )
+}
