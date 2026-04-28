@@ -137,7 +137,95 @@ Follow these rules strictly:
       };
     }
 
-    // MODE 3: Resolve review taxonomy (Build 3)
+    // MODE 3: Save warmup to database (Build 7)
+    if (mode === "save_warmup") {
+      const { conversationHistory, formData: warmupFormData } = body;
+
+      // Use Claude to extract structured data from the completed warmup conversation
+      const extractionPrompt = `You are extracting structured data from a completed warmup conversation.
+
+Review the conversation below and extract the following fields as a JSON object:
+- use_cases: array of objects, each with "problem" (string) and "solution" (string)
+- positioning: string — the positioning statement the PMM confirmed
+
+Return ONLY a valid JSON object with these two fields. No preamble, no markdown, no explanation.
+
+Conversation:
+${JSON.stringify(conversationHistory)}`;
+
+      const extractionResponse = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01"
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 1024,
+          messages: [{ role: "user", content: extractionPrompt }]
+        })
+      });
+
+      const extractionData = await extractionResponse.json();
+      if (!extractionResponse.ok) throw new Error(JSON.stringify(extractionData));
+
+      let extracted;
+      try {
+        const rawText = extractionData.content[0].text.replace(/```json|```/g, "").trim();
+        extracted = JSON.parse(rawText);
+      } catch (parseError) {
+        return {
+          statusCode: 500,
+          body: JSON.stringify({ error: "Failed to parse extracted warmup data", raw: extractionData.content[0].text })
+        };
+      }
+
+      // Write to Supabase user_products
+      const { createClient } = require('@supabase/supabase-js');
+      const supabase = createClient(
+        process.env.VITE_SUPABASE_URL,
+        process.env.SUPABASE_SERVICE_ROLE_KEY
+      );
+
+      const insertPayload = {
+        product_name: warmupFormData.productName,
+        category: warmupFormData.productCategory,
+        description: warmupFormData.productDescription,
+        industry: warmupFormData.industry,
+        icp: warmupFormData.icp,
+        strengths: warmupFormData.strengths,
+        key_differentiators: warmupFormData.differentiators || null,
+        use_cases: extracted.use_cases,
+        positioning: extracted.positioning,
+        user_id: body.userId || null
+      };
+
+      const { data: insertedRow, error: insertError } = await supabase
+        .from('user_products')
+        .insert(insertPayload)
+        .select('id')
+        .single();
+
+      if (insertError) {
+        return {
+          statusCode: 500,
+          body: JSON.stringify({ error: insertError.message })
+        };
+      }
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          mode: "warmup_saved",
+          product_id: insertedRow.id,
+          message: "Product profile saved successfully.",
+          saved: insertPayload
+        })
+      };
+    }
+
+    // MODE 4: Resolve review taxonomy (Build 3)
     if (mode === "resolve_taxonomy") {
       const systemPrompt = `You are a competitive intelligence assistant specializing 
 in software review platforms.
@@ -376,7 +464,7 @@ Return structured competitive intelligence with source attribution.`,
     return {
       statusCode: 400,
       body: JSON.stringify({
-        error: "Invalid mode. Use: warmup_start, warmup_continue, resolve_taxonomy, research_g2, research_trustradius, research_gartner_peers, research_website, create_research_job, or competitor_overview"
+        error: "Invalid mode. Use: warmup_start, warmup_continue, save_warmup, resolve_taxonomy, research_g2, research_trustradius, research_gartner_peers, research_website, create_research_job, or competitor_overview"
       })
     };
 
