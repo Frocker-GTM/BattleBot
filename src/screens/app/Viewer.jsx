@@ -18,8 +18,6 @@ export default function Viewer() {
         .from('battlecards')
         .select('*, battlecard_versions(*)')
         .eq('id', battlecardId)
-        .order('created_at', { ascending: false, foreignTable: 'battlecard_versions' })
-        .limit(1, { foreignTable: 'battlecard_versions' })
         .single()
       if (error) { setError(error.message); setLoading(false); return }
       setBattlecard(data)
