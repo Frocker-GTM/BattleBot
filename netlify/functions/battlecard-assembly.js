@@ -183,11 +183,36 @@ exports.handler = async function(event, context) {
     // ─────────────────────────────────────────────
     if (mode === "assemble_battlecard") {
       const { changeReason } = body;
-      const session = await loadSession(sessionId);
 
-      if (!session.confirmedScores) return respond(400, { error: "Use case scores not confirmed yet" });
-      if (!session.confirmedSwot) return respond(400, { error: "SWOT not confirmed yet" });
+      // Load scoring data directly from research_results
+      const { data: scoringRow } = await supabase
+        .from('research_results')
+        .select('result')
+        .eq('competitor_id', competitorId)
+        .eq('mode', 'battlecard_scoring')
+        .eq('status', 'complete')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
+      if (!scoringRow) return respond(400, { error: "Use case scores not found. Run scoring first." });
+
+      // Load SWOT data directly from research_results
+      const { data: swotRow } = await supabase
+        .from('research_results')
+        .select('result')
+        .eq('competitor_id', competitorId)
+        .eq('mode', 'battlecard_swot')
+        .eq('status', 'complete')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!swotRow) return respond(400, { error: "SWOT not found. Run SWOT generation first." });
+
+      const scoringData = typeof scoringRow.result === 'string' ? JSON.parse(scoringRow.result) : scoringRow.result;
+      const swotData = typeof swotRow.result === 'string' ? JSON.parse(swotRow.result) : swotRow.result;
+	  
       // Load all data needed for assembly
       const { data: product } = await supabase
         .from('user_products').select('*').eq('id', productId).single();
@@ -342,7 +367,7 @@ exports.handler = async function(event, context) {
           our_product_short: product.product_name.substring(0, 12),
           competitor_short: competitor.company_name.substring(0, 12)
         },
-        tab1_use_cases: session.confirmedScores,
+        tab1_use_cases: scoringData.scored_use_cases || scoringData,
         tab2: {
           overview: [
             {
@@ -381,7 +406,7 @@ exports.handler = async function(event, context) {
             praise: customerPraise.length > 0 ? customerPraise : ['See review research for detailed themes'],
             complaints: customerComplaints.length > 0 ? customerComplaints : ['See review research for detailed themes']
           },
-          swot: session.confirmedSwot
+          swot: swotData.swot || swotData
         },
         tab3_fud_sections: tab3Sections
       };
