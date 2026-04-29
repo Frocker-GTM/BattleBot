@@ -30,7 +30,7 @@ exports.handler = async function(event, context) {
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
-        max_tokens: 4096,
+        max_tokens: 8192,
         system: systemPrompt,
         messages: [{ role: "user", content: userMessage }]
       })
@@ -244,7 +244,18 @@ Produce the FUD analysis JSON now.`;
 
     let analysisData;
     try {
-      const raw = result.replace(/```json|```/g, '').trim();
+      // Strip markdown code fences and any leading/trailing whitespace
+      let raw = result
+        .replace(/^```(?:json)?\s*/i, '')
+        .replace(/\s*```\s*$/i, '')
+        .trim();
+      
+      // If still failing, try to extract JSON object directly
+      if (!raw.startsWith('{')) {
+        const match = raw.match(/\{[\s\S]*\}/);
+        if (match) raw = match[0];
+      }
+      
       analysisData = JSON.parse(raw);
     } catch(e) {
       throw new Error(`Failed to parse Claude response: ${result.substring(0, 200)}`);

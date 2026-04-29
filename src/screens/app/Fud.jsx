@@ -56,6 +56,7 @@ export default function Fud() {
         }),
       })
       const data = await res.json()
+	  console.log('FUD job response:', data) 
       if (data.error) throw new Error(data.error)
       setJobId(data.job_id)
 
