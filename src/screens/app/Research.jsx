@@ -142,6 +142,7 @@ export default function Research() {
           researchMode: modeMap[source],
           competitor: competitor.company_name,
           productName: competitor.product_name,
+          competitorId: competitor.id,
         }),
       })
       const data = await res.json()

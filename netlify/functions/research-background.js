@@ -15,7 +15,7 @@ exports.handler = async function(event, context) {
   );
 
   try {
-    const { job_id, mode, competitor, productName } = JSON.parse(event.body);
+    const { job_id, mode, competitor, productName, competitorId } = JSON.parse(event.body);
 
     // Update job status to running
     await supabase
@@ -128,7 +128,11 @@ Rules:
     // Save result to Supabase
     await supabase
       .from('research_results')
-      .update({ status: 'complete', result: textContent })
+      .update({ 
+        status: 'complete', 
+        result: textContent,
+        competitor_id: competitorId || null
+      })
       .eq('job_id', job_id);
 
     return {

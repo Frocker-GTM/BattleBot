@@ -427,6 +427,7 @@ Return structured competitive intelligence with source attribution.`,
           mode: body.researchMode,
           competitor,
           product_name: productName,
+          competitor_id: body.competitorId || null,
           status: 'pending'
         });
 
@@ -446,7 +447,8 @@ Return structured competitive intelligence with source attribution.`,
           job_id,
           mode: body.researchMode,
           competitor,
-          productName
+          productName,
+          competitorId: body.competitorId || null
         })
       });
 
