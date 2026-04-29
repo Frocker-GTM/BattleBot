@@ -33,6 +33,7 @@ export default function Fud() {
   }, [productId, competitorId])
 
   async function loadCandidates() {
+    console.log('loadCandidates called with competitorId:', competitorId)
     const { data } = await supabase
       .from('research_results')
       .select('result')
@@ -43,6 +44,7 @@ export default function Fud() {
       .limit(1)
       .maybeSingle()
 
+    console.log('loadCandidates result:', data)
     if (data?.result) {
       try {
         const parsed = typeof data.result === 'string'
