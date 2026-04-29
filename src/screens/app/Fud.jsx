@@ -39,7 +39,7 @@ export default function Fud() {
       .eq('product_id', productId)
       .eq('competitor_id', competitorId)
       .eq('status', 'active')
-      .order('rank', { ascending: true })
+      .order('created_at', { ascending: true })
     if (data) setCandidates(data)
   }
 
@@ -130,7 +130,7 @@ export default function Fud() {
   }
 
   const approvedWithProof = candidates.filter(c =>
-    c.approval_status === 'approved' && c.proof_point
+    c.status === 'approved' && c.proof_point
   ).length
 
   const competitorName = competitor?.company_name || '…'
@@ -233,10 +233,10 @@ export default function Fud() {
               </div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0, marginLeft: 16 }}>
                 <StatusBadge
-                  status={c.approval_status === 'approved' ? 'approved' : 'pending'}
-                  label={c.approval_status === 'approved' ? 'Approved' : 'Pending'}
+                  status={c.status === 'approved' ? 'approved' : 'pending'}
+                  label={c.status === 'approved' ? 'Approved' : 'Pending'}
                 />
-                {c.approval_status !== 'approved' && (
+                {c.status !== 'approved' && (
                   <button className="bb-btn-primary" style={{ padding: '6px 14px', fontSize: 11 }}
                     onClick={() => handleApprove(c)}>
                     Approve
@@ -250,7 +250,7 @@ export default function Fud() {
             </div>
 
             {/* Proof point */}
-            {c.approval_status === 'approved' && (
+            {c.status === 'approved' && (
               <div style={{
                 marginTop: 14, paddingTop: 14,
                 borderTop: '1px solid var(--divider)',
