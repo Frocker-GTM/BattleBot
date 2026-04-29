@@ -170,7 +170,7 @@ export default function Assembly() {
       const data = await res.json()
       console.log('assemble response:', data)
       if (data.error) throw new Error(data.error)
-      setBattlecardId(data.battlecard_id)
+      setBattlecardId(data.battlecardId || data.battlecard_id)
       setAssemblyStatus('complete')
     } catch {
       setAssemblyStatus('error')
