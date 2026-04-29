@@ -12,7 +12,8 @@ export default function Fud() {
   const navigate = useNavigate()
 
   const [product, setProduct] = useState(null)
-  const [jobStatus, setJobStatus] = useState('idle') // idle | running | complete | error
+  const [competitor, setCompetitor] = useState(null)
+  const [jobStatus, setJobStatus] = useState('idle')
   const [jobId, setJobId] = useState(null)
   const [candidates, setCandidates] = useState([])
   const [proofPoints, setProofPoints] = useState({})
@@ -22,10 +23,9 @@ export default function Fud() {
   useEffect(() => {
     supabase.from('user_products').select('*').eq('id', productId).single()
       .then(({ data }) => setProduct(data))
-
-    // Load any existing candidates
+    supabase.from('competitor_profiles').select('*').eq('id', competitorId).single()
+      .then(({ data }) => setCompetitor(data))
     loadCandidates()
-
     return () => { if (poller.current) clearInterval(poller.current) }
   }, [productId, competitorId])
 
@@ -48,8 +48,8 @@ export default function Fud() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           mode: 'create_fud_job',
-          product_id: productId,
-          competitor_id: competitorId,
+          productId,
+          competitorId,
         }),
       })
       const data = await res.json()
@@ -130,12 +130,14 @@ export default function Fud() {
     c.approval_status === 'approved' && c.proof_point
   ).length
 
+  const competitorName = competitor?.company_name || '…'
+
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', flexDirection: 'column' }}>
       <TopNav active="Dashboard" breadcrumb={
         <><span>{product?.product_name || '…'}</span>
         <span style={{ color: 'var(--text-dim)' }}>·</span>
-        <span style={{ color: 'var(--amber-gold)' }}>vs {decodeURIComponent(competitorId)}</span>
+        <span style={{ color: 'var(--amber-gold)' }}>vs {competitorName}</span>
         <span style={{ color: 'var(--text-dim)' }}>·</span>
         <span>FUD</span></>
       } />
@@ -148,7 +150,7 @@ export default function Fud() {
             <h1 className="h-display" style={{ margin: 0, fontSize: 32, fontWeight: 300 }}>
               {product?.product_name || '…'}
               <span style={{ color: 'var(--text-dim)', margin: '0 16px' }}>vs.</span>
-              <span style={{ color: 'var(--amber-gold)' }}>{decodeURIComponent(competitorId)}</span>
+              <span style={{ color: 'var(--amber-gold)' }}>{competitorName}</span>
             </h1>
             <p style={{ margin: '8px 0 0', color: 'var(--text-muted)', fontSize: 13 }}>
               Approve FUD candidates and complete proof points before assembly.
@@ -162,7 +164,7 @@ export default function Fud() {
               onClick={handleRunFud}
               disabled={jobStatus === 'running'}
               style={{ opacity: jobStatus === 'running' ? 0.5 : 1 }}>
-              {jobStatus === 'idle' && candidates.length > 0 ? 'Re-run analysis' : 'Run FUD analysis →'}
+              {candidates.length > 0 ? 'Re-run analysis' : 'Run FUD analysis →'}
             </button>
           </div>
         </div>
@@ -209,11 +211,16 @@ export default function Fud() {
                 </span>
                 <div>
                   <div style={{ fontFamily: 'Josefin Sans', fontSize: 16, fontWeight: 500, letterSpacing: '0.02em', marginBottom: 4 }}>
-                    {c.headline || c.fud_headline}
+                    {c.headline || c.fud_headline || c.weakness_summary}
                   </div>
                   <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, maxWidth: 680 }}>
-                    {c.threat_description || c.description}
+                    {c.threat_description || c.description || c.fud_angle}
                   </div>
+                  {c.discovery_question && (
+                    <div style={{ marginTop: 8, fontSize: 12, color: 'var(--amethyst-lavender)', fontStyle: 'italic' }}>
+                      Discovery: {c.discovery_question}
+                    </div>
+                  )}
                   {c.source_attribution && (
                     <div style={{ marginTop: 6, fontFamily: 'JetBrains Mono', fontSize: 11, color: 'var(--text-dim)' }}>
                       {c.source_attribution}
@@ -239,7 +246,7 @@ export default function Fud() {
               </div>
             </div>
 
-            {/* Proof point — shown after approval */}
+            {/* Proof point */}
             {c.approval_status === 'approved' && (
               <div style={{
                 marginTop: 14, paddingTop: 14,

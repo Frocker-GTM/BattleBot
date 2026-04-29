@@ -13,6 +13,7 @@ export default function Assembly() {
   const navigate = useNavigate()
 
   const [product, setProduct] = useState(null)
+  const [competitor, setCompetitor] = useState(null)
   const [scoringStatus, setScoringStatus] = useState('idle')
   const [swotStatus, setSwotStatus] = useState('idle')
   const [assemblyStatus, setAssemblyStatus] = useState('idle')
@@ -26,8 +27,10 @@ export default function Assembly() {
   useEffect(() => {
     supabase.from('user_products').select('*').eq('id', productId).single()
       .then(({ data }) => setProduct(data))
+    supabase.from('competitor_profiles').select('*').eq('id', competitorId).single()
+      .then(({ data }) => setCompetitor(data))
     return () => Object.values(pollers.current).forEach(clearInterval)
-  }, [productId])
+  }, [productId, competitorId])
 
   function startPoller(key, jobId, onComplete) {
     pollers.current[key] = setInterval(async () => {
@@ -117,7 +120,7 @@ export default function Assembly() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          mode: 'assemble',
+          mode: 'assemble_battlecard',
           product_id: productId,
           competitor_id: competitorId,
         }),
@@ -131,33 +134,35 @@ export default function Assembly() {
     }
   }
 
-  function updateScore(useCaseIndex, value) {
-    if (!scoringData?.use_cases) return
-    const updated = { ...scoringData }
-    updated.use_cases = [...updated.use_cases]
-    updated.use_cases[useCaseIndex] = {
-      ...updated.use_cases[useCaseIndex],
-      score: parseInt(value),
-    }
-    setScoringData(updated)
+  function updateScore(i, value) {
+    if (!scoringData) return
+    const useCases = Array.isArray(scoringData)
+      ? [...scoringData]
+      : [...(scoringData.scored_use_cases || [])]
+    useCases[i] = { ...useCases[i], uc_our_score: parseInt(value) }
+    setScoringData(Array.isArray(scoringData) ? useCases : { ...scoringData, scored_use_cases: useCases })
   }
 
   function updateSwotBullet(quadrant, index, value) {
     if (!swotData) return
     const updated = { ...swotData }
-    updated[quadrant] = [...(updated[quadrant] || [])]
-    updated[quadrant][index] = value
+    const key = quadrant.toLowerCase()
+    updated[key] = [...(updated[key] || [])]
+    updated[key][index] = value
     setSwotData(updated)
   }
 
-  const competitor = decodeURIComponent(competitorId)
+  const competitorName = competitor?.company_name || '…'
+  const useCases = Array.isArray(scoringData)
+    ? scoringData
+    : (scoringData?.scored_use_cases || [])
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', flexDirection: 'column' }}>
       <TopNav active="Dashboard" breadcrumb={
         <><span>{product?.product_name || '…'}</span>
         <span style={{ color: 'var(--text-dim)' }}>·</span>
-        <span style={{ color: 'var(--amber-gold)' }}>vs {competitor}</span>
+        <span style={{ color: 'var(--amber-gold)' }}>vs {competitorName}</span>
         <span style={{ color: 'var(--text-dim)' }}>·</span>
         <span>Assembly</span></>
       } />
@@ -179,15 +184,10 @@ export default function Assembly() {
 
         {/* Panel 1 — Scoring */}
         <AssemblyPanel
-          n="01"
-          title="Use case scoring"
+          n="01" title="Use case scoring"
           status={scoringConfirmed ? 'approved' : scoringStatus === 'idle' ? 'pending' : scoringStatus}
           locked={false}
-          subtitle={
-            scoringConfirmed
-              ? 'Harvey balls confirmed.'
-              : 'Score each use case 0–4 for your product vs the competitor.'
-          }
+          subtitle={scoringConfirmed ? 'Harvey balls confirmed.' : 'Score each use case 0–4 for your product vs the competitor.'}
         >
           {scoringStatus === 'idle' && (
             <button className="bb-btn-primary" onClick={handleRunScoring}>
@@ -205,16 +205,14 @@ export default function Assembly() {
               <button className="bb-btn-ghost" onClick={handleRunScoring}>Retry</button>
             </div>
           )}
-          {scoringStatus === 'complete' && scoringData && !scoringConfirmed && (
+          {scoringStatus === 'complete' && useCases.length > 0 && !scoringConfirmed && (
             <>
-              {/* Score table */}
               <div style={{ marginBottom: 18 }}>
                 <div style={{
                   display: 'grid', gridTemplateColumns: '1.5fr 80px 80px 1fr',
-                  gap: 14, padding: '8px 0', borderBottom: '1px solid var(--divider)',
-                  marginBottom: 6,
+                  gap: 14, padding: '8px 0', borderBottom: '1px solid var(--divider)', marginBottom: 6,
                 }}>
-                  {['Use case', product?.product_name || 'Yours', competitor, 'Rationale'].map((h, i) => (
+                  {['Use case', product?.product_name || 'Yours', competitorName, 'Rationale'].map((h, i) => (
                     <span key={i} className="eyebrow" style={{
                       fontSize: 9.5,
                       color: i === 1 ? 'var(--sapphire-sky)' : i === 2 ? 'var(--amber-gold)' : undefined,
@@ -222,17 +220,17 @@ export default function Assembly() {
                     }}>{h}</span>
                   ))}
                 </div>
-                {(Array.isArray(scoringData) ? scoringData : scoringData?.use_cases || []).map((uc, i) => (
+                {useCases.map((uc, i) => (
                   <div key={i} style={{
                     display: 'grid', gridTemplateColumns: '1.5fr 80px 80px 1fr',
                     gap: 14, padding: '12px 0', alignItems: 'center',
                     borderBottom: '1px solid var(--divider)',
                   }}>
-                    <span style={{ fontSize: 13.5 }}>{uc.use_case || uc.name}</span>
+                    <span style={{ fontSize: 13.5 }}>{uc.uc_name || uc.use_case || uc.name}</span>
                     <div style={{ textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-                      <HarveyBall value={uc.score || uc.your_score || 0} size={20} color="#5FA8E8" />
+                      <HarveyBall value={uc.uc_our_score ?? uc.score ?? 0} size={20} color="#5FA8E8" />
                       <select
-                        value={uc.score || uc.your_score || 0}
+                        value={uc.uc_our_score ?? uc.score ?? 0}
                         onChange={e => updateScore(i, e.target.value)}
                         style={{
                           background: 'var(--bg-input)', border: '1px solid var(--border)',
@@ -243,9 +241,9 @@ export default function Assembly() {
                       </select>
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                      <HarveyBall value={uc.competitor_score || 0} size={20} color="#F2C46D" />
+                      <HarveyBall value={uc.uc_their_score ?? uc.competitor_score ?? 0} size={20} color="#F2C46D" />
                     </div>
-                    <span style={{ fontSize: 12.5, color: 'var(--text-muted)' }}>{uc.rationale}</span>
+                    <span style={{ fontSize: 12.5, color: 'var(--text-muted)' }}>{uc.uc_rationale || uc.rationale}</span>
                   </div>
                 ))}
               </div>
@@ -263,8 +261,7 @@ export default function Assembly() {
 
         {/* Panel 2 — SWOT */}
         <AssemblyPanel
-          n="02"
-          title="SWOT — competitor perspective"
+          n="02" title="SWOT — competitor perspective"
           status={swotConfirmed ? 'approved' : swotStatus === 'idle' ? 'pending' : swotStatus}
           locked={!scoringConfirmed}
           subtitle="From the competitor's vantage. Edit any bullet before confirming."
@@ -272,9 +269,7 @@ export default function Assembly() {
           {!scoringConfirmed ? (
             <div style={{ color: 'var(--text-dim)', fontSize: 13 }}>Complete scoring first.</div>
           ) : swotStatus === 'idle' ? (
-            <button className="bb-btn-primary" onClick={handleRunSwot}>
-              Run SWOT generation →
-            </button>
+            <button className="bb-btn-primary" onClick={handleRunSwot}>Run SWOT generation →</button>
           ) : swotStatus === 'running' ? (
             <div style={{ color: 'var(--text-muted)', fontFamily: 'JetBrains Mono', fontSize: 13 }}>
               Generating SWOT — polling for results…
@@ -288,17 +283,15 @@ export default function Assembly() {
             <>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 18 }}>
                 {[
-                  { key: 'strengths',    label: 'Strengths',    color: '#86EFAC', bg: 'rgba(74,222,128,0.04)' },
-                  { key: 'weaknesses',   label: 'Weaknesses',   color: '#FCA5A5', bg: 'rgba(239,68,68,0.04)' },
-                  { key: 'opportunities',label: 'Opportunities', color: '#5FA8E8', bg: 'rgba(45,125,210,0.04)' },
-                  { key: 'threats',      label: 'Threats',      color: '#F2C46D', bg: 'rgba(232,160,32,0.04)' },
+                  { key: 'strengths',     label: 'Strengths',     color: '#86EFAC', bg: 'rgba(74,222,128,0.04)' },
+                  { key: 'weaknesses',    label: 'Weaknesses',    color: '#FCA5A5', bg: 'rgba(239,68,68,0.04)' },
+                  { key: 'opportunities', label: 'Opportunities', color: '#5FA8E8', bg: 'rgba(45,125,210,0.04)' },
+                  { key: 'threats',       label: 'Threats',       color: '#F2C46D', bg: 'rgba(232,160,32,0.04)' },
                 ].map(({ key, label, color, bg }) => (
                   <div key={key} style={{ background: bg, border: `1px solid ${color}33`, padding: '16px 18px' }}>
                     <div className="eyebrow" style={{ color, marginBottom: 10 }}>{label}</div>
-                    {(swotData[key] || []).map((bullet, i) => (
-                      <input
-                        key={i}
-                        className="bb-input"
+                    {(swotData.swot?.[key] || swotData[key] || []).map((bullet, i) => (
+                      <input key={i} className="bb-input"
                         style={{ marginBottom: 8, fontSize: 13 }}
                         value={bullet}
                         onChange={e => updateSwotBullet(key, i, e.target.value)}
@@ -320,8 +313,7 @@ export default function Assembly() {
 
         {/* Panel 3 — Assemble */}
         <AssemblyPanel
-          n="03"
-          title="Assemble battlecard"
+          n="03" title="Assemble battlecard"
           status={assemblyStatus === 'idle' ? 'pending' : assemblyStatus}
           locked={!swotConfirmed}
           subtitle="One write to battlecard_versions. Previous version archives automatically."
@@ -347,9 +339,7 @@ export default function Assembly() {
               <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
                 Scoring confirmed · SWOT confirmed · Ready to assemble.
               </div>
-              <button
-                className="bb-btn-amber"
-                style={{ padding: '14px 26px' }}
+              <button className="bb-btn-amber" style={{ padding: '14px 26px' }}
                 onClick={handleAssemble}
                 disabled={assemblyStatus === 'running'}>
                 {assemblyStatus === 'running' ? 'Assembling…' : 'Assemble battlecard →'}
@@ -378,9 +368,7 @@ function AssemblyPanel({ n, title, subtitle, status, locked, children }) {
               margin: 0, fontSize: 18, fontWeight: 500,
               textTransform: 'uppercase', letterSpacing: '0.08em',
             }}>{title}</h3>
-            {subtitle && (
-              <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: 13 }}>{subtitle}</p>
-            )}
+            {subtitle && <p style={{ margin: '4px 0 0', color: 'var(--text-muted)', fontSize: 13 }}>{subtitle}</p>}
           </div>
         </div>
         <StatusBadge status={status} />
