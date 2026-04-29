@@ -14,7 +14,7 @@ export default function Assembly() {
 
   const [product, setProduct] = useState(null)
   const [competitor, setCompetitor] = useState(null)
-  const [sessionId] = useState(() => `assembly_${productId}_${competitorId}_${Date.now()}`)
+  const [sessionId] = useState(() => `assembly_${productId}_${competitorId}`)
   const [scoringStatus, setScoringStatus] = useState('idle')
   const [swotStatus, setSwotStatus] = useState('idle')
   const [assemblyStatus, setAssemblyStatus] = useState('idle')
