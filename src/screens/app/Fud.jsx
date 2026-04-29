@@ -34,13 +34,23 @@ export default function Fud() {
 
   async function loadCandidates() {
     const { data } = await supabase
-      .from('fud_candidates')
-      .select('*')
-      .eq('product_id', productId)
+      .from('research_results')
+      .select('result')
       .eq('competitor_id', competitorId)
-      .eq('status', 'active')
-      .order('created_at', { ascending: true })
-    if (data) setCandidates(data)
+      .eq('mode', 'fud_analysis')
+      .eq('status', 'complete')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (data?.result) {
+      try {
+        const parsed = typeof data.result === 'string'
+          ? JSON.parse(data.result)
+          : data.result
+        setCandidates(parsed.fud_candidates || [])
+      } catch {}
+    }
   }
 
   async function handleRunFud() {
@@ -84,50 +94,27 @@ export default function Fud() {
   }
 
   async function handleApprove(candidate) {
-    try {
-      await fetch(FUD_FN, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          mode: 'approve_and_save',
-          fud_id: candidate.id,
-        }),
-      })
-      setCandidates(prev => prev.map(c =>
-        c.id === candidate.id ? { ...c, approval_status: 'approved' } : c
-      ))
-    } catch {}
+    setCandidates(prev => prev.map(c =>
+      c.source === candidate.source && c.weakness_summary === candidate.weakness_summary
+        ? { ...c, status: 'approved' }
+        : c
+    ))
   }
 
   async function handleArchive(candidate) {
-    try {
-      await supabase
-        .from('fud_candidates')
-        .update({ status: 'archived' })
-        .eq('id', candidate.id)
-      setCandidates(prev => prev.filter(c => c.id !== candidate.id))
-    } catch {}
+    setCandidates(prev => prev.filter(c =>
+      !(c.source === candidate.source && c.weakness_summary === candidate.weakness_summary)
+    ))
   }
 
   async function handleSaveProof(candidate) {
-    setSavingProof(prev => ({ ...prev, [candidate.id]: true }))
-    try {
-      await fetch(FUD_FN, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          mode: 'update_proof_point',
-          fud_id: candidate.id,
-          proof_point: proofPoints[candidate.id] || '',
-        }),
-      })
-      setCandidates(prev => prev.map(c =>
-        c.id === candidate.id
-          ? { ...c, proof_point: proofPoints[candidate.id] }
-          : c
-      ))
-    } catch {}
-    setSavingProof(prev => ({ ...prev, [candidate.id]: false }))
+    setSavingProof(prev => ({ ...prev, [candidate.source]: true }))
+    setCandidates(prev => prev.map(c =>
+      c.source === candidate.source && c.weakness_summary === candidate.weakness_summary
+        ? { ...c, proof_point: proofPoints[candidate.source] || '' }
+        : c
+    ))
+    setSavingProof(prev => ({ ...prev, [candidate.source]: false }))
   }
 
   const approvedWithProof = candidates.filter(c =>
@@ -204,7 +191,7 @@ export default function Fud() {
 
         {/* Candidate list */}
         {candidates.map((c, i) => (
-          <div key={c.id} style={{
+          <div key={i} style={{
             background: 'var(--bg-raised)', border: '1px solid var(--border)',
             padding: '22px 24px', marginBottom: 14,
           }}>
@@ -261,15 +248,15 @@ export default function Fud() {
                   <input
                     className="bb-input"
                     placeholder="Your counter-argument or proof point for this FUD…"
-                    value={proofPoints[c.id] ?? (c.proof_point || '')}
-                    onChange={e => setProofPoints(prev => ({ ...prev, [c.id]: e.target.value }))}
+                    value={proofPoints[c.source] ?? (c.proof_point || '')}
+                    onChange={e => setProofPoints(prev => ({ ...prev, [c.source]: e.target.value }))}
                   />
                   <button
                     className="bb-btn-ghost"
                     style={{ whiteSpace: 'nowrap', padding: '0 18px' }}
-                    disabled={savingProof[c.id]}
+                    disabled={savingProof[c.source]}
                     onClick={() => handleSaveProof(c)}>
-                    {savingProof[c.id] ? 'Saving…' : 'Save'}
+                    {savingProof[c.source] ? 'Saving…' : 'Save'}
                   </button>
                 </div>
               </div>
