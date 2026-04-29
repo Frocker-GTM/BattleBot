@@ -266,6 +266,7 @@ Produce the FUD analysis JSON now.`;
       .from('research_results')
       .update({
         status: 'complete',
+        competitor_id: competitorId,
         result: JSON.stringify({
           fud_candidates: analysisData.fud_candidates,
           competitive_overlaps: analysisData.competitive_overlaps,
