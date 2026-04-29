@@ -14,6 +14,7 @@ export default function Assembly() {
 
   const [product, setProduct] = useState(null)
   const [competitor, setCompetitor] = useState(null)
+  const [sessionId] = useState(() => `assembly_${productId}_${competitorId}_${Date.now()}`)
   const [scoringStatus, setScoringStatus] = useState('idle')
   const [swotStatus, setSwotStatus] = useState('idle')
   const [assemblyStatus, setAssemblyStatus] = useState('idle')
@@ -61,8 +62,9 @@ export default function Assembly() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           mode: 'create_scoring_job',
-          product_id: productId,
-          competitor_id: competitorId,
+          productId,
+          competitorId,
+          sessionId,
         }),
       })
       const data = await res.json()
@@ -92,8 +94,9 @@ export default function Assembly() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           mode: 'create_swot_job',
-          product_id: productId,
-          competitor_id: competitorId,
+          productId,
+          competitorId,
+          sessionId,
         }),
       })
       const data = await res.json()
@@ -122,8 +125,9 @@ export default function Assembly() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           mode: 'assemble_battlecard',
-          product_id: productId,
-          competitor_id: competitorId,
+          productId,
+          competitorId,
+          sessionId,
         }),
       })
       const data = await res.json()
