@@ -208,6 +208,7 @@ Return scored use cases JSON.`;
         .from('research_results')
         .update({
           status: 'complete',
+          competitor_id: competitorId,
           result: JSON.stringify({
             jobType: 'scoring',
             scored_use_cases: scoringData.scored_use_cases,
@@ -278,6 +279,7 @@ Return the SWOT JSON.`;
         .from('research_results')
         .update({
           status: 'complete',
+          competitor_id: competitorId,
           result: JSON.stringify({
             jobType: 'swot',
             swot: swotData.swot,
