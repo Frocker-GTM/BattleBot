@@ -21,8 +21,10 @@ export default function Research() {
   const [competitorMessage, setCompetitorMessage] = useState(null)
 
   // Taxonomy
-  const [taxonomy, setTaxonomy] = useState(null)
+  const [taxonomyMessages, setTaxonomyMessages] = useState([])
+  const [taxonomyInput, setTaxonomyInput] = useState('')
   const [taxonomyLoading, setTaxonomyLoading] = useState(false)
+  const [taxonomyConfirmed, setTaxonomyConfirmed] = useState(false)
 
   // Research jobs
   const [jobs, setJobs] = useState({
@@ -104,7 +106,6 @@ export default function Research() {
   async function handleResolveTaxonomy() {
     if (!competitor) return
     setTaxonomyLoading(true)
-    setTaxonomy(null)
     try {
       const res = await fetch(NETLIFY_FN, {
         method: 'POST',
@@ -116,9 +117,40 @@ export default function Research() {
         }),
       })
       const data = await res.json()
-      setTaxonomy(data.message)
+      setTaxonomyMessages([
+        { role: 'assistant', content: data.message }
+      ])
     } catch (err) {
-      setTaxonomy('Failed to resolve taxonomy. Try again.')
+      setTaxonomyMessages([{ role: 'assistant', content: 'Failed to resolve taxonomy. Try again.' }])
+    }
+    setTaxonomyLoading(false)
+  }
+
+  async function handleTaxonomyReply(e) {
+    e.preventDefault()
+    if (!taxonomyInput.trim()) return
+    setTaxonomyLoading(true)
+
+    const newMessages = [
+      ...taxonomyMessages,
+      { role: 'user', content: taxonomyInput }
+    ]
+    setTaxonomyMessages(newMessages)
+    setTaxonomyInput('')
+
+    try {
+      const res = await fetch(NETLIFY_FN, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: 'warmup_continue',
+          messages: newMessages,
+        }),
+      })
+      const data = await res.json()
+      setTaxonomyMessages(data.conversationHistory)
+    } catch (err) {
+      setTaxonomyMessages(prev => [...prev, { role: 'assistant', content: 'Error — try again.' }])
     }
     setTaxonomyLoading(false)
   }
@@ -321,26 +353,77 @@ export default function Research() {
           padding: '22px 24px', marginBottom: 20,
           opacity: competitorReady ? 1 : 0.4,
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: taxonomy ? 14 : 0 }}>
-            <div className="eyebrow">Step 2 — Taxonomy resolver</div>
-            <button className="bb-btn-ghost"
-              disabled={!competitorReady || taxonomyLoading}
-              style={{ whiteSpace: 'nowrap' }}
-              onClick={handleResolveTaxonomy}>
-              {taxonomyLoading ? 'Resolving…' : taxonomy ? 'Re-resolve' : 'Resolve taxonomy'}
-            </button>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: taxonomyMessages.length ? 14 : 0 }}>
+            <div className="eyebrow" style={{ color: taxonomyConfirmed ? 'var(--status-complete)' : undefined }}>
+              {taxonomyConfirmed ? '✓ Taxonomy confirmed' : 'Step 2 — Taxonomy resolver'}
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {taxonomyMessages.length > 0 && !taxonomyConfirmed && (
+                <button className="bb-btn-primary" style={{ padding: '6px 14px', fontSize: 11 }}
+                  onClick={() => setTaxonomyConfirmed(true)}>
+                  Confirm listings ✓
+                </button>
+              )}
+              <button className="bb-btn-ghost"
+                disabled={!competitorReady || taxonomyLoading}
+                style={{ whiteSpace: 'nowrap' }}
+                onClick={handleResolveTaxonomy}>
+                {taxonomyLoading && taxonomyMessages.length === 0 ? 'Resolving…' : taxonomyMessages.length ? 'Re-resolve' : 'Resolve taxonomy'}
+              </button>
+            </div>
           </div>
-          {taxonomy && (
-            <div style={{
-              marginTop: 14, padding: '14px 16px',
-              background: 'var(--bg)', border: '1px solid var(--border)',
-              fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6,
-              whiteSpace: 'pre-wrap',
-            }}>
-              <div className="eyebrow" style={{ color: 'var(--amethyst-lavender)', marginBottom: 8 }}>
-                Taxonomy resolution
-              </div>
-              {taxonomy}
+
+          {/* Conversation thread */}
+          {taxonomyMessages.length > 0 && (
+            <div style={{ marginTop: 14 }}>
+              {taxonomyMessages.map((msg, i) => (
+                <div key={i} style={{
+                  display: 'flex',
+                  justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                  marginBottom: 10,
+                }}>
+                  <div style={{
+                    maxWidth: '90%',
+                    padding: '12px 16px',
+                    background: msg.role === 'user' ? 'rgba(45,125,210,0.10)' : 'var(--bg)',
+                    border: `1px solid ${msg.role === 'user' ? 'rgba(45,125,210,0.35)' : 'var(--border)'}`,
+                    fontSize: 13, lineHeight: 1.65, color: 'var(--text)',
+                    whiteSpace: 'pre-wrap',
+                  }}>
+                    <div className="eyebrow" style={{
+                      fontSize: 9.5, marginBottom: 6,
+                      color: msg.role === 'user' ? 'var(--sapphire-sky)' : 'var(--amber)',
+                    }}>
+                      {msg.role === 'user' ? '— You' : '— BattleBot'}
+                    </div>
+                    {msg.content}
+                  </div>
+                </div>
+              ))}
+
+              {!taxonomyConfirmed && (
+                <form onSubmit={handleTaxonomyReply} style={{
+                  display: 'flex', gap: 10, marginTop: 10,
+                  alignItems: 'center',
+                  background: 'var(--bg-input)', border: '1px solid var(--border)',
+                  padding: '10px 12px',
+                }}>
+                  <span style={{ color: 'var(--amber)', fontFamily: 'JetBrains Mono', fontSize: 12 }}>›</span>
+                  <input
+                    className="bb-input"
+                    style={{ background: 'transparent', border: 'none', padding: 0, fontSize: 13 }}
+                    placeholder="Reply to confirm scope, date range, or categories…"
+                    value={taxonomyInput}
+                    onChange={e => setTaxonomyInput(e.target.value)}
+                    disabled={taxonomyLoading}
+                  />
+                  <button className="bb-btn-ghost" type="submit"
+                    disabled={taxonomyLoading || !taxonomyInput.trim()}
+                    style={{ padding: '6px 14px', whiteSpace: 'nowrap' }}>
+                    {taxonomyLoading ? '…' : 'Send'}
+                  </button>
+                </form>
+              )}
             </div>
           )}
         </div>
