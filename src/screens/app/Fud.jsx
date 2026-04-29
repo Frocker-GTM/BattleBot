@@ -24,7 +24,10 @@ export default function Fud() {
     supabase.from('user_products').select('*').eq('id', productId).single()
       .then(({ data }) => setProduct(data))
     supabase.from('competitor_profiles').select('*').eq('id', competitorId).single()
-      .then(({ data }) => setCompetitor(data))
+      .then(({ data, error }) => {
+        console.log('FUD competitor fetch:', data, error)
+        setCompetitor(data)
+      })
     loadCandidates()
     return () => { if (poller.current) clearInterval(poller.current) }
   }, [productId, competitorId])
