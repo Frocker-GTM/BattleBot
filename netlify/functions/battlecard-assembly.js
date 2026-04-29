@@ -244,13 +244,21 @@ exports.handler = async function(event, context) {
         .eq('status', 'complete');
 
       // Load FUD candidates
-      const { data: fudCandidates } = await supabase
-        .from('fud_candidates')
-        .select('*')
-        .eq('product_id', productId)
+      const { data: fudRow } = await supabase
+        .from('research_results')
+        .select('result')
         .eq('competitor_id', competitorId)
-        .eq('status', 'active')
-        .order('signal_strength', { ascending: false });
+        .eq('mode', 'fud_analysis')
+        .eq('status', 'complete')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      const fudResult = fudRow?.result
+        ? (typeof fudRow.result === 'string' ? JSON.parse(fudRow.result) : fudRow.result)
+        : { fud_candidates: [] };
+
+      const fudCandidates = fudResult.fud_candidates || [];
 
       // Build analyst placements and bullets
       const analystPlacements = [];
