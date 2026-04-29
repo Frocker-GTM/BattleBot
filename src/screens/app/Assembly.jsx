@@ -30,6 +30,43 @@ export default function Assembly() {
       .then(({ data }) => setProduct(data))
     supabase.from('competitor_profiles').select('*').eq('id', competitorId).single()
       .then(({ data }) => setCompetitor(data))
+
+    // Load existing scoring result
+    supabase.from('research_results').select('result')
+      .eq('competitor_id', competitorId)
+      .eq('mode', 'battlecard_scoring')
+      .eq('status', 'complete')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.result) {
+          try {
+            const parsed = typeof data.result === 'string' ? JSON.parse(data.result) : data.result
+            setScoringData(parsed)
+            setScoringStatus('complete')
+          } catch {}
+        }
+      })
+
+    // Load existing SWOT result
+    supabase.from('research_results').select('result')
+      .eq('competitor_id', competitorId)
+      .eq('mode', 'battlecard_swot')
+      .eq('status', 'complete')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.result) {
+          try {
+            const parsed = typeof data.result === 'string' ? JSON.parse(data.result) : data.result
+            setSwotData(parsed)
+            setSwotStatus('complete')
+          } catch {}
+        }
+      })
+
     return () => Object.values(pollers.current).forEach(clearInterval)
   }, [productId, competitorId])
 
