@@ -53,7 +53,7 @@ export default function App() {
       <Route path="/dashboard" element={<Protected session={session}><Dashboard /></Protected>} />
       <Route path="/warmup" element={<Protected session={session}><Warmup /></Protected>} />
       <Route path="/research/:productId" element={<Protected session={session}><Research /></Protected>} />
-      <Route path="/analyst/:productId" element={<Protected session={session}><Analyst /></Protected>} />
+      <Route path="/analyst/:productId/:competitorId" element={<Protected session={session}><Analyst /></Protected>} />
       <Route path="/fud/:productId/:competitorId" element={<Protected session={session}><Fud /></Protected>} />
       <Route path="/assembly/:productId/:competitorId" element={<Protected session={session}><Assembly /></Protected>} />
       <Route path="/battlecard/:battlecardId" element={<Protected session={session}><Viewer /></Protected>} />
