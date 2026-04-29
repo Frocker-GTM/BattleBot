@@ -66,6 +66,7 @@ export default function Assembly() {
         }),
       })
       const data = await res.json()
+	  console.log('scoring job response:', data)
       if (data.error) throw new Error(data.error)
       startPoller('scoring', data.job_id, (result) => {
         setScoringStatus('complete')
