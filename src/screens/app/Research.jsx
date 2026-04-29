@@ -74,6 +74,8 @@ export default function Research() {
       .in('mode', ['research_g2', 'research_trustradius', 'research_gartner_peers', 'research_website'])
       .eq('status', 'complete')
       .order('created_at', { ascending: false })
+	  
+	console.log('existing research results:', existing)  
 
     if (existing && existing.length > 0) {
       // For each source, use the most recent complete result
