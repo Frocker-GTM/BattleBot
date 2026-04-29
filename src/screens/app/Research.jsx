@@ -7,26 +7,35 @@ import StatusBadge from '../../components/StatusBadge.jsx'
 const NETLIFY_FN = '/.netlify/functions/battlecard'
 const STATUS_FN = '/.netlify/functions/research-status'
 
+const SOURCE_LABELS = {
+  g2:            { label: 'G2',                   mode: 'research_g2' },
+  trustradius:   { label: 'TrustRadius',           mode: 'research_trustradius' },
+  gartner_peers: { label: 'Gartner Peer Insights', mode: 'research_gartner_peers' },
+  website:       { label: 'Competitor website',    mode: 'research_website' },
+}
+
 export default function Research() {
   const { productId } = useParams()
   const navigate = useNavigate()
 
   const [product, setProduct] = useState(null)
 
-  // Competitor resolution
-  const [companyName, setCompanyName] = useState('')
-  const [productName, setProductName] = useState('')
-  const [competitor, setCompetitor] = useState(null) // full competitor_profiles record
-  const [competitorStatus, setCompetitorStatus] = useState('idle') // idle | searching | found | created | error
-  const [competitorMessage, setCompetitorMessage] = useState(null)
+  // Competitor list + selection
+  const [competitors, setCompetitors] = useState([])
+  const [competitor, setCompetitor] = useState(null)
+  const [showAddNew, setShowAddNew] = useState(false)
+  const [newCompanyName, setNewCompanyName] = useState('')
+  const [newProductName, setNewProductName] = useState('')
+  const [creating, setCreating] = useState(false)
+  const [createError, setCreateError] = useState(null)
 
-  // Taxonomy
+  // Taxonomy conversation
   const [taxonomyMessages, setTaxonomyMessages] = useState([])
   const [taxonomyInput, setTaxonomyInput] = useState('')
   const [taxonomyLoading, setTaxonomyLoading] = useState(false)
   const [taxonomyConfirmed, setTaxonomyConfirmed] = useState(false)
 
-  // Research jobs
+  // Research jobs — keyed by source
   const [jobs, setJobs] = useState({
     g2:            { status: 'pending', result: null, expanded: false, jobId: null },
     trustradius:   { status: 'pending', result: null, expanded: false, jobId: null },
@@ -36,56 +45,83 @@ export default function Research() {
 
   const pollers = useRef({})
 
+  // Load product + all competitor profiles on mount
   useEffect(() => {
     supabase.from('user_products').select('*').eq('id', productId).single()
       .then(({ data }) => setProduct(data))
+    supabase.from('competitor_profiles').select('*').order('company_name')
+      .then(({ data }) => setCompetitors(data || []))
     return () => Object.values(pollers.current).forEach(clearInterval)
   }, [productId])
 
-  async function handleFindOrCreateCompetitor() {
-    if (!companyName.trim()) return
-    setCompetitorStatus('searching')
-    setCompetitorMessage(null)
-    setCompetitor(null)
+  // When a competitor is selected, load existing research results
+  async function selectCompetitor(comp) {
+    setCompetitor(comp)
+    setTaxonomyMessages([])
+    setTaxonomyConfirmed(false)
+    setJobs({
+      g2:            { status: 'pending', result: null, expanded: false, jobId: null },
+      trustradius:   { status: 'pending', result: null, expanded: false, jobId: null },
+      gartner_peers: { status: 'pending', result: null, expanded: false, jobId: null },
+      website:       { status: 'pending', result: null, expanded: false, jobId: null },
+    })
 
+    // Load existing research results for this competitor
+    const { data: existing } = await supabase
+      .from('research_results')
+      .select('*')
+      .eq('competitor_id', comp.id)
+      .in('mode', ['research_g2', 'research_trustradius', 'research_gartner_peers', 'research_website'])
+      .eq('status', 'complete')
+      .order('created_at', { ascending: false })
+
+    if (existing && existing.length > 0) {
+      // For each source, use the most recent complete result
+      const latest = {}
+      existing.forEach(r => {
+        const key = r.mode.replace('research_', '').replace('gartner_peers', 'gartner_peers')
+        const sourceKey = Object.keys(SOURCE_LABELS).find(k => SOURCE_LABELS[k].mode === r.mode)
+        if (sourceKey && !latest[sourceKey]) {
+          latest[sourceKey] = r
+        }
+      })
+
+      setJobs(prev => {
+        const updated = { ...prev }
+        Object.entries(latest).forEach(([key, row]) => {
+          updated[key] = { status: 'complete', result: row.result, expanded: false, jobId: row.job_id }
+        })
+        return updated
+      })
+    }
+  }
+
+  async function handleCreateCompetitor(e) {
+    e.preventDefault()
+    if (!newCompanyName.trim()) return
+    setCreating(true)
+    setCreateError(null)
     try {
-      // Search for existing profile
-      const { data: existing } = await supabase
-        .from('competitor_profiles')
-        .select('*')
-        .ilike('company_name', companyName.trim())
-        .ilike('product_name', productName.trim() || '%')
-        .limit(1)
-        .maybeSingle()
-
-      if (existing) {
-        setCompetitor(existing)
-        setCompetitorStatus('found')
-        setCompetitorMessage(`Found existing profile for ${existing.company_name} — ${existing.product_name}.`)
-        return
-      }
-
-      // Not found — create one using AI overview
       const { data: { user } } = await supabase.auth.getUser()
 
+      // Get AI overview
       const res = await fetch(NETLIFY_FN, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           mode: 'competitor_overview',
-          competitor: companyName.trim(),
-          productName: productName.trim(),
+          competitor: newCompanyName.trim(),
+          productName: newProductName.trim(),
         }),
       })
       const overviewData = await res.json()
-      const description = overviewData.result || ''
 
       const { data: created, error } = await supabase
         .from('competitor_profiles')
         .insert({
-          company_name: companyName.trim(),
-          product_name: productName.trim() || companyName.trim(),
-          description,
+          company_name: newCompanyName.trim(),
+          product_name: newProductName.trim() || newCompanyName.trim(),
+          description: overviewData.result || '',
           created_by: user.id,
         })
         .select('*')
@@ -93,14 +129,15 @@ export default function Research() {
 
       if (error) throw new Error(error.message)
 
-      setCompetitor(created)
-      setCompetitorStatus('created')
-      setCompetitorMessage(`Created new competitor profile for ${created.company_name}.`)
-
+      setCompetitors(prev => [...prev, created].sort((a, b) => a.company_name.localeCompare(b.company_name)))
+      setShowAddNew(false)
+      setNewCompanyName('')
+      setNewProductName('')
+      await selectCompetitor(created)
     } catch (err) {
-      setCompetitorStatus('error')
-      setCompetitorMessage(`Error: ${err.message}`)
+      setCreateError(err.message)
     }
+    setCreating(false)
   }
 
   async function handleResolveTaxonomy() {
@@ -117,10 +154,8 @@ export default function Research() {
         }),
       })
       const data = await res.json()
-      setTaxonomyMessages([
-        { role: 'assistant', content: data.message }
-      ])
-    } catch (err) {
+      setTaxonomyMessages([{ role: 'assistant', content: data.message }])
+    } catch {
       setTaxonomyMessages([{ role: 'assistant', content: 'Failed to resolve taxonomy. Try again.' }])
     }
     setTaxonomyLoading(false)
@@ -130,48 +165,32 @@ export default function Research() {
     e.preventDefault()
     if (!taxonomyInput.trim()) return
     setTaxonomyLoading(true)
-
-    const newMessages = [
-      ...taxonomyMessages,
-      { role: 'user', content: taxonomyInput }
-    ]
+    const newMessages = [...taxonomyMessages, { role: 'user', content: taxonomyInput }]
     setTaxonomyMessages(newMessages)
     setTaxonomyInput('')
-
     try {
       const res = await fetch(NETLIFY_FN, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          mode: 'warmup_continue',
-          messages: newMessages,
-        }),
+        body: JSON.stringify({ mode: 'warmup_continue', messages: newMessages }),
       })
       const data = await res.json()
       setTaxonomyMessages(data.conversationHistory)
-    } catch (err) {
+    } catch {
       setTaxonomyMessages(prev => [...prev, { role: 'assistant', content: 'Error — try again.' }])
     }
     setTaxonomyLoading(false)
   }
 
   async function handleRunJob(source) {
-    const modeMap = {
-      g2:            'research_g2',
-      trustradius:   'research_trustradius',
-      gartner_peers: 'research_gartner_peers',
-      website:       'research_website',
-    }
-
     setJobs(prev => ({ ...prev, [source]: { ...prev[source], status: 'running' } }))
-
     try {
       const res = await fetch(NETLIFY_FN, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           mode: 'create_research_job',
-          researchMode: modeMap[source],
+          researchMode: SOURCE_LABELS[source].mode,
           competitor: competitor.company_name,
           productName: competitor.product_name,
           competitorId: competitor.id,
@@ -179,7 +198,6 @@ export default function Research() {
       })
       const data = await res.json()
       const jobId = data.job_id
-
       setJobs(prev => ({ ...prev, [source]: { ...prev[source], jobId } }))
 
       pollers.current[source] = setInterval(async () => {
@@ -199,15 +217,8 @@ export default function Research() {
           }
         } catch {}
       }, 3000)
-
-    } catch (err) {
+    } catch {
       setJobs(prev => ({ ...prev, [source]: { ...prev[source], status: 'error' } }))
-    }
-  }
-
-  async function handleRunAll() {
-    for (const source of ['g2', 'trustradius', 'gartner_peers', 'website']) {
-      if (jobs[source].status === 'pending') await handleRunJob(source)
     }
   }
 
@@ -216,14 +227,7 @@ export default function Research() {
   }
 
   const anyComplete = Object.values(jobs).some(j => j.status === 'complete')
-  const competitorReady = competitor !== null
-
-  const sourceLabels = {
-    g2:            'G2',
-    trustradius:   'TrustRadius',
-    gartner_peers: 'Gartner Peer Insights',
-    website:       'Competitor website',
-  }
+  const allSources = Object.keys(SOURCE_LABELS)
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', flexDirection: 'column' }}>
@@ -242,25 +246,25 @@ export default function Research() {
               {product?.product_name || '…'}
               <span style={{ color: 'var(--text-dim)', margin: '0 16px' }}>vs.</span>
               <span style={{ color: 'var(--amber-gold)' }}>
-                {competitor ? competitor.company_name : '…'}
+                {competitor ? competitor.company_name : 'select a competitor'}
               </span>
             </h1>
             <p style={{ margin: '8px 0 0', color: 'var(--text-muted)', fontSize: 13 }}>
-              Find or create a competitor profile, then run research jobs.
+              Select an existing competitor or add a new one, then run research.
             </p>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
             <button className="bb-btn-ghost"
-              disabled={!competitorReady}
-              style={{ opacity: competitorReady ? 1 : 0.4 }}
-              onClick={() => navigate(`/analyst/${productId}/${competitor.id}`)}>
+              disabled={!competitor}
+              style={{ opacity: competitor ? 1 : 0.4 }}
+              onClick={() => navigate(`/analyst/${productId}/${competitor?.id}`)}>
               Analyst reports
             </button>
             <button className="bb-btn-primary"
-              disabled={!competitorReady}
-              style={{ opacity: competitorReady ? 1 : 0.4 }}
-              onClick={handleRunAll}>
-              Run all four →
+              disabled={!competitor}
+              style={{ opacity: competitor ? 1 : 0.4 }}
+              onClick={() => allSources.forEach(s => { if (jobs[s].status === 'pending') handleRunJob(s) })}>
+              Run all →
             </button>
           </div>
         </div>
@@ -268,68 +272,113 @@ export default function Research() {
 
       <div style={{ flex: 1, overflow: 'auto', padding: '28px 44px' }}>
 
-        {/* Step 1 — Competitor resolution */}
+        {/* Step 1 — Competitor selection */}
         <div style={{
-          background: 'var(--bg-raised)', border: `1px solid ${competitorReady ? 'var(--sapphire)' : 'var(--border)'}`,
+          background: 'var(--bg-raised)',
+          border: `1px solid ${competitor ? 'var(--sapphire)' : 'var(--border)'}`,
           padding: '22px 24px', marginBottom: 20,
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-            <div className="eyebrow">
-              {competitorReady ? '✓ Competitor resolved' : 'Step 1 — Find or create competitor'}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <div className="eyebrow" style={{ color: competitor ? 'var(--status-complete)' : undefined }}>
+              {competitor ? '✓ Competitor selected' : 'Step 1 — Select competitor'}
             </div>
             {competitor && (
               <button className="bb-btn-ghost" style={{ padding: '4px 12px', fontSize: 11 }}
-                onClick={() => { setCompetitor(null); setCompetitorStatus('idle'); setCompetitorMessage(null) }}>
+                onClick={() => { setCompetitor(null); setJobs({ g2: { status: 'pending', result: null, expanded: false, jobId: null }, trustradius: { status: 'pending', result: null, expanded: false, jobId: null }, gartner_peers: { status: 'pending', result: null, expanded: false, jobId: null }, website: { status: 'pending', result: null, expanded: false, jobId: null } }) }}>
                 Change
               </button>
             )}
           </div>
 
-          {!competitorReady ? (
+          {!competitor ? (
             <>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: 14, alignItems: 'flex-end' }}>
-                <div>
-                  <label className="bb-label">Company name</label>
-                  <input className="bb-input" placeholder="e.g. Salesforce"
-                    value={companyName} onChange={e => setCompanyName(e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && handleFindOrCreateCompetitor()} />
+              {/* Existing competitor list */}
+              {competitors.length > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
+                  {competitors.map(c => (
+                    <div key={c.id}
+                      onClick={() => selectCompetitor(c)}
+                      style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        padding: '14px 18px', cursor: 'pointer',
+                        background: 'var(--bg)', border: '1px solid var(--border)',
+                        transition: 'border-color 120ms',
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--sapphire)'}
+                      onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
+                    >
+                      <div>
+                        <div style={{ fontFamily: 'Josefin Sans', fontSize: 15, fontWeight: 500 }}>
+                          {c.company_name}
+                        </div>
+                        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
+                          {c.product_name}
+                        </div>
+                      </div>
+                      <span style={{
+                        fontFamily: 'Josefin Sans', textTransform: 'uppercase',
+                        letterSpacing: '0.14em', fontSize: 11, color: 'var(--sapphire-sky)',
+                      }}>Select →</span>
+                    </div>
+                  ))}
                 </div>
-                <div>
-                  <label className="bb-label">Specific product</label>
-                  <input className="bb-input" placeholder="e.g. Marketing Cloud (optional)"
-                    value={productName} onChange={e => setProductName(e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && handleFindOrCreateCompetitor()} />
-                </div>
-                <button className="bb-btn-primary"
-                  disabled={competitorStatus === 'searching' || !companyName.trim()}
-                  style={{ whiteSpace: 'nowrap', opacity: !companyName.trim() ? 0.4 : 1 }}
-                  onClick={handleFindOrCreateCompetitor}>
-                  {competitorStatus === 'searching' ? 'Searching…' : 'Find or create →'}
+              )}
+
+              {/* Add new */}
+              {!showAddNew ? (
+                <button className="bb-btn-ghost" onClick={() => setShowAddNew(true)}
+                  style={{ fontSize: 12 }}>
+                  ＋ Add new competitor
                 </button>
-              </div>
-              {competitorMessage && (
-                <div style={{
-                  marginTop: 12, fontSize: 13, padding: '8px 12px',
-                  color: competitorStatus === 'error' ? 'var(--status-error)' : 'var(--text-muted)',
-                  border: `1px solid ${competitorStatus === 'error' ? 'rgba(239,68,68,0.3)' : 'var(--border)'}`,
-                  background: competitorStatus === 'error' ? 'rgba(239,68,68,0.08)' : 'var(--bg)',
-                }}>{competitorMessage}</div>
+              ) : (
+                <form onSubmit={handleCreateCompetitor} style={{
+                  padding: '18px', background: 'var(--bg)',
+                  border: '1px solid var(--border)',
+                }}>
+                  <div className="eyebrow" style={{ marginBottom: 14, color: 'var(--amber)' }}>
+                    New competitor profile
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+                    <div>
+                      <label className="bb-label">Company name</label>
+                      <input className="bb-input" required placeholder="e.g. Salesforce"
+                        value={newCompanyName} onChange={e => setNewCompanyName(e.target.value)} />
+                    </div>
+                    <div>
+                      <label className="bb-label">Specific product</label>
+                      <input className="bb-input" placeholder="e.g. Marketing Cloud"
+                        value={newProductName} onChange={e => setNewProductName(e.target.value)} />
+                    </div>
+                  </div>
+                  {createError && (
+                    <div style={{
+                      fontSize: 13, color: 'var(--status-error)', marginBottom: 12,
+                      padding: '8px 12px', border: '1px solid rgba(239,68,68,0.3)',
+                      background: 'rgba(239,68,68,0.08)',
+                    }}>{createError}</div>
+                  )}
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button className="bb-btn-primary" type="submit" disabled={creating}>
+                      {creating ? 'Creating…' : 'Create profile →'}
+                    </button>
+                    <button className="bb-btn-ghost" type="button"
+                      onClick={() => { setShowAddNew(false); setCreateError(null) }}>
+                      Cancel
+                    </button>
+                  </div>
+                </form>
               )}
             </>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20 }}>
+            // Selected competitor summary
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
               <div>
                 <div className="eyebrow" style={{ fontSize: 9.5, color: 'var(--text-dim)', marginBottom: 4 }}>Company</div>
-                <div style={{ fontSize: 15, fontFamily: 'Josefin Sans', fontWeight: 500 }}>{competitor.company_name}</div>
+                <div style={{ fontFamily: 'Josefin Sans', fontSize: 16, fontWeight: 500 }}>{competitor.company_name}</div>
               </div>
               <div>
                 <div className="eyebrow" style={{ fontSize: 9.5, color: 'var(--text-dim)', marginBottom: 4 }}>Product</div>
-                <div style={{ fontSize: 15, fontFamily: 'Josefin Sans', fontWeight: 500 }}>{competitor.product_name}</div>
-              </div>
-              <div>
-                <div className="eyebrow" style={{ fontSize: 9.5, color: 'var(--text-dim)', marginBottom: 4 }}>Status</div>
-                <StatusBadge status={competitorStatus === 'found' ? 'complete' : 'approved'}
-                  label={competitorStatus === 'found' ? 'Existing profile' : 'New profile'} />
+                <div style={{ fontFamily: 'Josefin Sans', fontSize: 16, fontWeight: 500 }}>{competitor.product_name}</div>
               </div>
               <div>
                 <div className="eyebrow" style={{ fontSize: 9.5, color: 'var(--text-dim)', marginBottom: 4 }}>Profile ID</div>
@@ -347,189 +396,179 @@ export default function Research() {
           )}
         </div>
 
-        {/* Step 2 — Taxonomy resolver */}
-        <div style={{
-          background: 'var(--bg-raised)', border: '1px solid var(--border)',
-          padding: '22px 24px', marginBottom: 20,
-          opacity: competitorReady ? 1 : 0.4,
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: taxonomyMessages.length ? 14 : 0 }}>
-            <div className="eyebrow" style={{ color: taxonomyConfirmed ? 'var(--status-complete)' : undefined }}>
-              {taxonomyConfirmed ? '✓ Taxonomy confirmed' : 'Step 2 — Taxonomy resolver'}
+        {/* Step 2 — Taxonomy */}
+        {competitor && (
+          <div style={{
+            background: 'var(--bg-raised)', border: '1px solid var(--border)',
+            padding: '22px 24px', marginBottom: 20,
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div className="eyebrow" style={{ color: taxonomyConfirmed ? 'var(--status-complete)' : undefined }}>
+                {taxonomyConfirmed ? '✓ Taxonomy confirmed' : 'Step 2 — Taxonomy resolver (optional)'}
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {taxonomyMessages.length > 0 && !taxonomyConfirmed && (
+                  <button className="bb-btn-primary" style={{ padding: '6px 14px', fontSize: 11 }}
+                    onClick={() => setTaxonomyConfirmed(true)}>
+                    Confirm ✓
+                  </button>
+                )}
+                {!taxonomyConfirmed && (
+                  <button className="bb-btn-ghost" disabled={taxonomyLoading}
+                    onClick={handleResolveTaxonomy}>
+                    {taxonomyLoading && !taxonomyMessages.length ? 'Resolving…' : taxonomyMessages.length ? 'Re-resolve' : 'Resolve taxonomy'}
+                  </button>
+                )}
+                {!taxonomyConfirmed && anyComplete && (
+                  <button className="bb-btn-ghost" style={{ fontSize: 11 }}
+                    onClick={() => setTaxonomyConfirmed(true)}>
+                    Skip
+                  </button>
+                )}
+              </div>
             </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {taxonomyMessages.length > 0 && !taxonomyConfirmed && (
-                <button className="bb-btn-primary" style={{ padding: '6px 14px', fontSize: 11 }}
-                  onClick={() => setTaxonomyConfirmed(true)}>
-                  Confirm listings ✓
-                </button>
-              )}
-              <button className="bb-btn-ghost"
-                disabled={!competitorReady || taxonomyLoading}
-                style={{ whiteSpace: 'nowrap' }}
-                onClick={handleResolveTaxonomy}>
-                {taxonomyLoading && taxonomyMessages.length === 0 ? 'Resolving…' : taxonomyMessages.length ? 'Re-resolve' : 'Resolve taxonomy'}
-              </button>
-            </div>
-          </div>
 
-          {/* Conversation thread */}
-          {taxonomyMessages.length > 0 && (
-            <div style={{ marginTop: 14 }}>
-              {taxonomyMessages.map((msg, i) => (
-                <div key={i} style={{
-                  display: 'flex',
-                  justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                  marginBottom: 10,
-                }}>
-                  <div style={{
-                    maxWidth: '90%',
-                    padding: '12px 16px',
-                    background: msg.role === 'user' ? 'rgba(45,125,210,0.10)' : 'var(--bg)',
-                    border: `1px solid ${msg.role === 'user' ? 'rgba(45,125,210,0.35)' : 'var(--border)'}`,
-                    fontSize: 13, lineHeight: 1.65, color: 'var(--text)',
-                    whiteSpace: 'pre-wrap',
+            {taxonomyMessages.length > 0 && !taxonomyConfirmed && (
+              <div style={{ marginTop: 14 }}>
+                {taxonomyMessages.map((msg, i) => (
+                  <div key={i} style={{
+                    display: 'flex',
+                    justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                    marginBottom: 10,
                   }}>
-                    <div className="eyebrow" style={{
-                      fontSize: 9.5, marginBottom: 6,
-                      color: msg.role === 'user' ? 'var(--sapphire-sky)' : 'var(--amber)',
+                    <div style={{
+                      maxWidth: '90%', padding: '12px 16px',
+                      background: msg.role === 'user' ? 'rgba(45,125,210,0.10)' : 'var(--bg)',
+                      border: `1px solid ${msg.role === 'user' ? 'rgba(45,125,210,0.35)' : 'var(--border)'}`,
+                      fontSize: 13, lineHeight: 1.65, color: 'var(--text)', whiteSpace: 'pre-wrap',
                     }}>
-                      {msg.role === 'user' ? '— You' : '— BattleBot'}
+                      <div className="eyebrow" style={{
+                        fontSize: 9.5, marginBottom: 6,
+                        color: msg.role === 'user' ? 'var(--sapphire-sky)' : 'var(--amber)',
+                      }}>
+                        {msg.role === 'user' ? '— You' : '— BattleBot'}
+                      </div>
+                      {msg.content}
                     </div>
-                    {msg.content}
                   </div>
-                </div>
-              ))}
-
-              {!taxonomyConfirmed && (
+                ))}
                 <form onSubmit={handleTaxonomyReply} style={{
-                  display: 'flex', gap: 10, marginTop: 10,
-                  alignItems: 'center',
-                  background: 'var(--bg-input)', border: '1px solid var(--border)',
-                  padding: '10px 12px',
+                  display: 'flex', gap: 10, marginTop: 10, alignItems: 'center',
+                  background: 'var(--bg-input)', border: '1px solid var(--border)', padding: '10px 12px',
                 }}>
                   <span style={{ color: 'var(--amber)', fontFamily: 'JetBrains Mono', fontSize: 12 }}>›</span>
-                  <input
-                    className="bb-input"
+                  <input className="bb-input"
                     style={{ background: 'transparent', border: 'none', padding: 0, fontSize: 13 }}
-                    placeholder="Reply to confirm scope, date range, or categories…"
-                    value={taxonomyInput}
-                    onChange={e => setTaxonomyInput(e.target.value)}
-                    disabled={taxonomyLoading}
-                  />
+                    placeholder="Reply to confirm scope…"
+                    value={taxonomyInput} onChange={e => setTaxonomyInput(e.target.value)}
+                    disabled={taxonomyLoading} />
                   <button className="bb-btn-ghost" type="submit"
                     disabled={taxonomyLoading || !taxonomyInput.trim()}
                     style={{ padding: '6px 14px', whiteSpace: 'nowrap' }}>
                     {taxonomyLoading ? '…' : 'Send'}
                   </button>
                 </form>
-              )}
-            </div>
-          )}
-        </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Step 3 — Research jobs */}
-        <div className="eyebrow" style={{ marginBottom: 14, display: 'flex', justifyContent: 'space-between' }}>
-          <span>Step 3 — Web research jobs</span>
-          <span style={{ color: 'var(--text-dim)', fontFamily: 'JetBrains Mono', letterSpacing: 0 }}>
-            4 sources · weighted
-          </span>
-        </div>
+        {competitor && (
+          <>
+            <div className="eyebrow" style={{ marginBottom: 14, display: 'flex', justifyContent: 'space-between' }}>
+              <span>Step 3 — Web research</span>
+              <span style={{ color: 'var(--text-dim)', fontFamily: 'JetBrains Mono', letterSpacing: 0 }}>
+                {Object.values(jobs).filter(j => j.status === 'complete').length} / 4 complete
+              </span>
+            </div>
 
-        <div style={{
-          background: 'var(--bg-raised)', border: '1px solid var(--border)',
-          marginBottom: 24, opacity: competitorReady ? 1 : 0.4,
-        }}>
-          {Object.entries(jobs).map(([source, job]) => (
-            <div key={source} style={{ borderBottom: '1px solid var(--divider)' }}>
-              <div style={{
-                display: 'grid', gridTemplateColumns: '200px 140px 1fr 120px',
-                alignItems: 'center', gap: 20, padding: '18px 22px',
-              }}>
-                <div>
-                  <div style={{ fontFamily: 'Josefin Sans', fontSize: 14, fontWeight: 500 }}>
-                    {sourceLabels[source]}
-                  </div>
-                  <div className="eyebrow" style={{ color: 'var(--text-dim)', marginTop: 2, fontSize: 9.5 }}>
-                    research_results
-                  </div>
-                </div>
-                <StatusBadge status={job.status} />
-                <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-                  {job.status === 'running' && 'Running — polling for results…'}
-                  {job.status === 'complete' && 'Complete — results ready'}
-                  {job.status === 'error' && 'Error — try running again'}
-                  {job.status === 'pending' && 'Ready to run'}
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  {job.status === 'complete' ? (
-                    <span onClick={() => toggleExpanded(source)} style={{
-                      fontFamily: 'Josefin Sans', textTransform: 'uppercase',
-                      letterSpacing: '0.14em', fontSize: 11,
-                      color: 'var(--sapphire-sky)', cursor: 'pointer',
+            <div style={{ background: 'var(--bg-raised)', border: '1px solid var(--border)', marginBottom: 24 }}>
+              {Object.entries(SOURCE_LABELS).map(([source, { label }]) => {
+                const job = jobs[source]
+                return (
+                  <div key={source} style={{ borderBottom: '1px solid var(--divider)' }}>
+                    <div style={{
+                      display: 'grid', gridTemplateColumns: '200px 140px 1fr 120px',
+                      alignItems: 'center', gap: 20, padding: '18px 22px',
                     }}>
-                      {job.expanded ? 'Hide ↑' : 'View →'}
-                    </span>
-                  ) : job.status === 'running' ? (
-                    <span style={{ fontFamily: 'JetBrains Mono', fontSize: 11, color: 'var(--text-dim)' }}>
-                      polling…
-                    </span>
-                  ) : (
-                    <button className="bb-btn-ghost"
-                      style={{ padding: '7px 14px', fontSize: 10.5 }}
-                      disabled={!competitorReady}
-                      onClick={() => handleRunJob(source)}>
-                      Run
-                    </button>
-                  )}
+                      <div>
+                        <div style={{ fontFamily: 'Josefin Sans', fontSize: 14, fontWeight: 500 }}>{label}</div>
+                        <div className="eyebrow" style={{ color: 'var(--text-dim)', marginTop: 2, fontSize: 9.5 }}>
+                          research_results
+                        </div>
+                      </div>
+                      <StatusBadge status={job.status} />
+                      <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                        {job.status === 'running'  && 'Running — polling for results…'}
+                        {job.status === 'complete' && 'Complete — results loaded'}
+                        {job.status === 'error'    && 'Error — try running again'}
+                        {job.status === 'pending'  && 'Ready to run'}
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        {job.status === 'complete' ? (
+                          <span onClick={() => toggleExpanded(source)} style={{
+                            fontFamily: 'Josefin Sans', textTransform: 'uppercase',
+                            letterSpacing: '0.14em', fontSize: 11,
+                            color: 'var(--sapphire-sky)', cursor: 'pointer',
+                          }}>
+                            {job.expanded ? 'Hide ↑' : 'View →'}
+                          </span>
+                        ) : job.status === 'running' ? (
+                          <span style={{ fontFamily: 'JetBrains Mono', fontSize: 11, color: 'var(--text-dim)' }}>
+                            polling…
+                          </span>
+                        ) : (
+                          <button className="bb-btn-ghost" style={{ padding: '7px 14px', fontSize: 10.5 }}
+                            onClick={() => handleRunJob(source)}>
+                            Run
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    {job.expanded && job.result && (
+                      <div style={{
+                        padding: '16px 22px 20px', fontSize: 13,
+                        color: 'var(--text-muted)', lineHeight: 1.7,
+                        whiteSpace: 'pre-wrap', borderTop: '1px solid var(--divider)',
+                      }}>
+                        {job.result}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Next steps */}
+            <div style={{
+              padding: '20px 22px', border: '1px dashed var(--border-strong)',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              marginBottom: 24,
+            }}>
+              <div>
+                <div className="eyebrow" style={{ color: 'var(--amber)', marginBottom: 6 }}>Next</div>
+                <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>
+                  {anyComplete
+                    ? 'Research available. Proceed to FUD analysis or add analyst reports.'
+                    : 'Run at least one research job to unlock FUD analysis.'}
                 </div>
               </div>
-              {job.expanded && job.result && (
-                <div style={{
-                  padding: '16px 22px 20px',
-                  fontSize: 13, color: 'var(--text-muted)',
-                  lineHeight: 1.7, whiteSpace: 'pre-wrap',
-                  borderTop: '1px solid var(--divider)',
-                }}>
-                  {job.result}
-                </div>
-              )}
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button className="bb-btn-ghost"
+                  onClick={() => navigate(`/analyst/${productId}/${competitor.id}`)}>
+                  Analyst reports
+                </button>
+                <button className="bb-btn-amber"
+                  disabled={!anyComplete}
+                  style={{ opacity: anyComplete ? 1 : 0.4 }}
+                  onClick={() => navigate(`/fud/${productId}/${competitor.id}`)}>
+                  FUD analysis →
+                </button>
+              </div>
             </div>
-          ))}
-        </div>
-
-        {/* Next steps */}
-        <div style={{
-          padding: '20px 22px', border: '1px dashed var(--border-strong)',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          marginBottom: 24,
-        }}>
-          <div>
-            <div className="eyebrow" style={{ color: 'var(--amber)', marginBottom: 6 }}>Next</div>
-            <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>
-              {!competitorReady
-                ? 'Resolve a competitor profile to unlock research.'
-                : anyComplete
-                  ? 'Research complete. Run FUD analysis or add analyst reports to raise source weight.'
-                  : 'Run at least one research job to unlock FUD analysis.'}
-            </div>
-          </div>
-          <div style={{ display: 'flex', gap: 10 }}>
-            <button className="bb-btn-ghost"
-              disabled={!competitorReady}
-              style={{ opacity: competitorReady ? 1 : 0.4 }}
-              onClick={() => navigate(`/analyst/${productId}/${competitor?.id}`)}>
-              Analyst reports
-            </button>
-            <button className="bb-btn-amber"
-              disabled={!anyComplete || !competitorReady}
-              style={{ opacity: anyComplete && competitorReady ? 1 : 0.4 }}
-              onClick={() => navigate(`/fud/${productId}/${competitor?.id}`)}>
-              FUD analysis →
-            </button>
-          </div>
-        </div>
-
+          </>
+        )}
       </div>
     </div>
   )
