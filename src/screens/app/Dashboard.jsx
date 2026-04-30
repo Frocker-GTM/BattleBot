@@ -46,7 +46,7 @@ export default function Dashboard() {
       <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '340px 1fr', overflow: 'hidden' }}>
 
         {/* Products rail */}
-        <div style={{ borderRight: '1px solid var(--divider)', padding: '24px', overflow: 'auto' }}>
+        <div id="products" style={{ borderRight: '1px solid var(--divider)', padding: '24px', overflow: 'auto' }}>
           <div className="eyebrow" style={{ marginBottom: 14, display: 'flex', justifyContent: 'space-between' }}>
             <span>Your products</span>
             <span style={{ color: 'var(--text-dim)', fontFamily: 'JetBrains Mono', letterSpacing: 0 }}>{products.length}</span>
@@ -90,7 +90,7 @@ export default function Dashboard() {
         </div>
 
         {/* Battlecards table */}
-        <div style={{ overflow: 'auto' }}>
+        <div id="battlecards" style={{ overflow: 'auto' }}>
           <div style={{
             display: 'grid', gridTemplateColumns: '1.4fr 1.4fr 140px 90px 140px 80px',
             gap: 16, padding: '20px 22px', borderBottom: '1px solid var(--border)',

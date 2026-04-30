@@ -43,19 +43,16 @@ export default function TopNav({ active = 'Dashboard', breadcrumb = null }) {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 22 }}>
-        {['Dashboard', 'Products', 'Battlecards'].map(item => (
         <span
-          key={item}
-          onClick={() => navigate('/dashboard')}
-            style={{
-              fontFamily: 'Josefin Sans', fontWeight: 500,
-              textTransform: 'uppercase', letterSpacing: '0.16em', fontSize: 11,
-              color: item === active ? 'var(--text)' : 'var(--text-muted)',
-              borderBottom: item === active ? '1px solid var(--amber)' : '1px solid transparent',
-              paddingBottom: 4, paddingTop: 4, cursor: 'pointer',
-            }}
-          >{item}</span>
-        ))}
+        onClick={() => navigate('/dashboard')}
+        style={{
+          fontFamily: 'Josefin Sans', fontWeight: 500,
+          textTransform: 'uppercase', letterSpacing: '0.16em', fontSize: 11,
+          color: 'var(--text)',
+          borderBottom: '1px solid var(--amber)',
+          paddingBottom: 4, paddingTop: 4, cursor: 'pointer',
+        }}
+      >Dashboard</span>
 
         <div
           onClick={handleSignOut}

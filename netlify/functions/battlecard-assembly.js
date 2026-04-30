@@ -235,6 +235,18 @@ exports.handler = async function(event, context) {
         .eq('mode', 'analyst_forrester')
         .eq('status', 'complete');
 
+      // Load website research
+      const { data: websiteData } = await supabase
+        .from('research_results')
+        .select('result')
+        .eq('competitor_id', competitorId)
+        .eq('mode', 'research_website')
+        .eq('status', 'complete')
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      const websiteResult = websiteData?.[0]?.result || '';
+
       // Load review data
       const { data: reviewResults } = await supabase
         .from('research_results')
@@ -299,24 +311,56 @@ exports.handler = async function(event, context) {
       const customerPraise = [];
       const customerComplaints = [];
 
+      const seenPlatforms = new Set();
       reviewResults?.forEach(r => {
         try {
-          const platform = r.mode.replace('research_', '').toUpperCase();
-          // Extract rating if present in result text
-          const ratingMatch = r.result.match(/(\d+\.?\d*)\s*\/\s*5/);
+          const platform = r.mode.replace('research_', '').replace('gartner_peers', 'Gartner Peer Insights').toUpperCase();
+          if (seenPlatforms.has(platform)) return;
+          seenPlatforms.add(platform);
+
+          // Extract rating
+          const ratingMatch = r.result.match(/(\d+\.?\d*)\s*(?:out of\s*)?\/\s*(?:5|10)/i);
           if (ratingMatch) {
-            customerRatings.push({
-              label: platform,
-              value: `${ratingMatch[1]} / 5`,
-              n: ''
-            });
+            customerRatings.push({ label: platform, value: `${ratingMatch[1]} / 5`, n: '' });
           }
-          // Extract praise and complaint themes (simplified)
-          if (r.result.includes('praise') || r.result.includes('Praise') || r.result.includes('PRAISE')) {
-            customerPraise.push(`${platform}: See research results`);
+
+          // Extract praise themes — look for numbered praise sections
+          const praiseSection = r.result.match(/praise|strength|positive|pros?|what.*like/i);
+          if (praiseSection) {
+            // Extract bullet points or numbered items after praise heading
+            const lines = r.result.split('\n');
+            let inPraise = false;
+            let praiseCount = 0;
+            for (const line of lines) {
+              if (/praise|strength.*theme|top.*praise|positive theme/i.test(line)) { inPraise = true; continue; }
+              if (inPraise && /complaint|weakness|negative|cons?|concern/i.test(line)) { inPraise = false; }
+              if (inPraise && praiseCount < 3) {
+                const cleaned = line.replace(/^[\s\-\*\d\.\#]+/, '').trim();
+                if (cleaned.length > 20 && cleaned.length < 200) {
+                  customerPraise.push(cleaned);
+                  praiseCount++;
+                }
+              }
+            }
           }
-          if (r.result.includes('complaint') || r.result.includes('Complaint')) {
-            customerComplaints.push(`${platform}: See research results`);
+
+          // Extract complaint themes
+          const complaintSection = r.result.match(/complaint|weakness|negative|cons?|concern|criticis/i);
+          if (complaintSection) {
+            const lines = r.result.split('\n');
+            let inComplaint = false;
+            let complaintCount = 0;
+            for (const line of lines) {
+              if (/complaint.*theme|top.*complaint|negative theme|cons?:|concern|criticis/i.test(line)) { inComplaint = true; continue; }
+              if (inComplaint && /praise|strength|positive|pros?:/i.test(line)) { inComplaint = false; }
+              if (inComplaint && complaintCount < 3) {
+                const cleaned = line.replace(/^[\s\-\*\d\.\#]+/, '').trim();
+                if (cleaned.length > 20 && cleaned.length < 200) {
+                  customerComplaints.push(cleaned);
+                  complaintCount++;
+                }
+              }
+            }
           }
         } catch(e) {}
       });
@@ -385,21 +429,55 @@ exports.handler = async function(event, context) {
               accessed: new Date().toISOString().split('T')[0]
             },
             {
-              label: 'Target Customer',
-              value: competitor.target_customer_size || 'See profile',
-              sources: [],
+              label: 'Ideal Customer Profile',
+              value: (() => {
+                const match = websiteResult.match(/ideal customer[^:\n]*[:]\s*([^\n]{20,400})/i)
+                  || websiteResult.match(/target(?:ed)? customer[^:\n]*[:]\s*([^\n]{20,400})/i)
+                  || websiteResult.match(/designed for[^:\n]*[:]\s*([^\n]{20,400})/i)
+                  || websiteResult.match(/best suited for[^:\n]*[:]\s*([^\n]{20,400})/i);
+                return match ? match[1].replace(/\*+/g, '').trim() : (competitor.icp || competitor.target_customer_size || 'See research results');
+              })(),
+              sources: websiteResult ? [{ label: 'Competitor website', href: '#' }] : [],
               accessed: new Date().toISOString().split('T')[0]
             },
             {
-              label: 'Geographic Focus',
-              value: competitor.geographic_focus || 'See profile',
-              sources: [],
+              label: 'Core Messaging',
+              value: (() => {
+                const match = websiteResult.match(/(?:primary tagline|value proposition|tagline|battle cry)[^:\n]*[:]\s*([^\n]{20,400})/i)
+                  || websiteResult.match(/[""]([^""]{20,200})[""]/);
+                return match ? match[1].replace(/\*+/g, '').trim() : (competitor.positioning || 'See research results');
+              })(),
+              sources: websiteResult ? [{ label: 'Competitor website', href: '#' }] : [],
               accessed: new Date().toISOString().split('T')[0]
             },
             {
-              label: 'Target Industries',
-              value: competitor.target_industries || 'See profile',
-              sources: [],
+              label: 'Self-Proclaimed Strengths',
+              value: (() => {
+                const lines = websiteResult.split('\n');
+                const strengthLines = [];
+                let inStrengths = false;
+                for (const line of lines) {
+                  if (/self-proclaimed strength|key differentiator|core strength/i.test(line)) { inStrengths = true; continue; }
+                  if (inStrengths && /pricing|customer|analyst|recent/i.test(line)) break;
+                  if (inStrengths) {
+                    const cleaned = line.replace(/^[\s\-\*\#\d\.]+/, '').trim();
+                    if (cleaned.length > 15) strengthLines.push(cleaned);
+                    if (strengthLines.length >= 3) break;
+                  }
+                }
+                return strengthLines.length > 0 ? strengthLines.join(' · ') : (competitor.known_strengths || 'See research results');
+              })(),
+              sources: websiteResult ? [{ label: 'Competitor website', href: '#' }] : [],
+              accessed: new Date().toISOString().split('T')[0]
+            },
+            {
+              label: 'Known Pricing & Packaging',
+              value: (() => {
+                const match = websiteResult.match(/pricing[^:\n]*[:]\s*([^\n]{20,300})/i)
+                  || websiteResult.match(/subscription.based/i);
+                return match ? (typeof match[1] === 'string' ? match[1].replace(/\*+/g, '').trim() : 'Subscription-based') : (competitor.pricing_notes || 'Not publicly disclosed');
+              })(),
+              sources: websiteResult ? [{ label: 'Competitor website', href: '#' }] : [],
               accessed: new Date().toISOString().split('T')[0]
             }
           ],
