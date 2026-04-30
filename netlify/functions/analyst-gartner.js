@@ -83,12 +83,13 @@ exports.handler = async function(event, context) {
     // MODE: start_extraction
     // ─────────────────────────────────────────────
     if (mode === "start_extraction") {
-      const { mqName, mqMonth, mqYear, analystNames, gartnerReportId, vendorName, productName } = body;
+      const { mqName, mqMonth, mqYear, analystNames, gartnerReportId, vendorName, productName, competitorId: bodyCompetitorId } = body;
 
       const sessionState = {
         step: "awaiting_mq_graphic",
         mqName, mqMonth, mqYear, analystNames,
         gartnerReportId, vendorName, productName,
+        competitorId: bodyCompetitorId || null,
         extractedData: {
           report_type: "Gartner Magic Quadrant",
           mq_name: mqName,
@@ -400,6 +401,7 @@ Return JSON array, max 5 items:
         mode: 'analyst_gartner',
         competitor: session.extractedData.vendor_name,
         product_name: session.extractedData.product_name || session.extractedData.vendor_name,
+        competitor_id: session.competitorId || null,
         result: JSON.stringify(session.extractedData),
         status: 'complete'
       });

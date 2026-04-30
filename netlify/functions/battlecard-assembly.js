@@ -332,11 +332,12 @@ exports.handler = async function(event, context) {
             let inPraise = false;
             let praiseCount = 0;
             for (const line of lines) {
-              if (/praise|strength.*theme|top.*praise|positive theme/i.test(line)) { inPraise = true; continue; }
+              if (/###.*(?:praise|positive|strength)|top\s+\d+\s+praise/i.test(line)) { inPraise = true; continue; }
+              if (/^\d+\.\s+[🏆⚡📉✅]|^###\s+\d+\./i.test(line)) { inPraise = true; continue; }
               if (inPraise && /complaint|weakness|negative|cons?|concern/i.test(line)) { inPraise = false; }
               if (inPraise && praiseCount < 3) {
                 const cleaned = line.replace(/^[\s\-\*\d\.\#]+/, '').trim();
-                if (cleaned.length > 20 && cleaned.length < 200) {
+                if (cleaned.length > 20 && cleaned.length < 200 && !cleaned.startsWith('>') && !cleaned.startsWith('"') && !cleaned.includes('Representative Quote')) {
                   customerPraise.push(cleaned);
                   praiseCount++;
                 }
@@ -351,11 +352,12 @@ exports.handler = async function(event, context) {
             let inComplaint = false;
             let complaintCount = 0;
             for (const line of lines) {
-              if (/complaint.*theme|top.*complaint|negative theme|cons?:|concern|criticis/i.test(line)) { inComplaint = true; continue; }
+              if (/###.*(?:complaint|negative|weak)|top\s+\d+\s+complaint/i.test(line)) { inComplaint = true; continue; }
+              if (/^❌|^###\s+\d+\.\s+[📈🐢💸🔀]/i.test(line)) { inComplaint = true; continue; }
               if (inComplaint && /praise|strength|positive|pros?:/i.test(line)) { inComplaint = false; }
               if (inComplaint && complaintCount < 3) {
                 const cleaned = line.replace(/^[\s\-\*\d\.\#]+/, '').trim();
-                if (cleaned.length > 20 && cleaned.length < 200) {
+                if (cleaned.length > 20 && cleaned.length < 200 && !cleaned.startsWith('>') && !cleaned.startsWith('"') && !cleaned.includes('Representative Quote')) {
                   customerComplaints.push(cleaned);
                   complaintCount++;
                 }

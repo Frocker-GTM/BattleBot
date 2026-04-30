@@ -83,12 +83,13 @@ exports.handler = async function(event, context) {
     // MODE: start_extraction
     // ─────────────────────────────────────────────
     if (mode === "start_extraction") {
-      const { waveName, waveQuarter, waveYear, analystName, vendorName, productName } = body;
+      const { waveName, waveQuarter, waveYear, analystName, vendorName, productName, competitorId: bodyCompetitorId } = body;
 
       const sessionState = {
         step: "awaiting_score_table",
         waveName, waveQuarter, waveYear, analystName,
         vendorName, productName,
+        competitorId: bodyCompetitorId || null,
         extractedData: {
           report_type: "Forrester Wave",
           wave_name: waveName,
@@ -459,6 +460,7 @@ Return JSON array, max 5 items, strongest signals first:
         mode: 'analyst_forrester',
         competitor: session.extractedData.vendor_name,
         product_name: session.extractedData.product_name,
+        competitor_id: session.competitorId || null,
         result: JSON.stringify(session.extractedData),
         status: 'complete'
       });
