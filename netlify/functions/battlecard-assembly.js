@@ -431,11 +431,12 @@ exports.handler = async function(event, context) {
             {
               label: 'Ideal Customer Profile',
               value: (() => {
-                const match = websiteResult.match(/ideal customer[^:\n]*[:]\s*([^\n]{20,400})/i)
-                  || websiteResult.match(/target(?:ed)? customer[^:\n]*[:]\s*([^\n]{20,400})/i)
-                  || websiteResult.match(/designed for[^:\n]*[:]\s*([^\n]{20,400})/i)
-                  || websiteResult.match(/best suited for[^:\n]*[:]\s*([^\n]{20,400})/i);
-                return match ? match[1].replace(/\*+/g, '').trim() : (competitor.icp || competitor.target_customer_size || 'See research results');
+                const sectionMatch = websiteResult.match(/##[^#\n]*(?:ideal customer|icp|target(?:ed)? customer)[^\n]*\n([\s\S]{20,600}?)(?=\n##|\n---|\z)/i);
+                if (sectionMatch) {
+                  const lines = sectionMatch[1].split('\n').map(l => l.replace(/^[\s\*\#\-]+/, '').trim()).filter(l => l.length > 15 && !l.startsWith('Source') && !l.startsWith('http'));
+                  if (lines.length > 0) return lines.slice(0, 3).join(' ');
+                }
+                return competitor.icp || competitor.target_customer_size || 'See research results';
               })(),
               sources: websiteResult ? [{ label: 'Competitor website', href: '#' }] : [],
               accessed: new Date().toISOString().split('T')[0]
@@ -443,9 +444,13 @@ exports.handler = async function(event, context) {
             {
               label: 'Core Messaging',
               value: (() => {
-                const match = websiteResult.match(/(?:primary tagline|value proposition|tagline|battle cry)[^:\n]*[:]\s*([^\n]{20,400})/i)
-                  || websiteResult.match(/[""]([^""]{20,200})[""]/);
-                return match ? match[1].replace(/\*+/g, '').trim() : (competitor.positioning || 'See research results');
+                const sectionMatch = websiteResult.match(/##[^#\n]*(?:value proposition|tagline|positioning|messaging)[^\n]*\n([\s\S]{20,400}?)(?=\n##|\n---)/i);
+                if (sectionMatch) {
+                  const lines = sectionMatch[1].split('\n').map(l => l.replace(/^[\s\*\#\-]+/, '').trim()).filter(l => l.length > 15 && !l.startsWith('Source') && !l.startsWith('http'));
+                  if (lines.length > 0) return lines[0].replace(/\*+/g, '').trim();
+                }
+                const boldMatch = websiteResult.match(/\*\*[""]([^""]{20,300})[""]\*\*/);
+                return boldMatch ? boldMatch[1] : (competitor.positioning || 'See research results');
               })(),
               sources: websiteResult ? [{ label: 'Competitor website', href: '#' }] : [],
               accessed: new Date().toISOString().split('T')[0]
@@ -453,19 +458,16 @@ exports.handler = async function(event, context) {
             {
               label: 'Self-Proclaimed Strengths',
               value: (() => {
-                const lines = websiteResult.split('\n');
-                const strengthLines = [];
-                let inStrengths = false;
-                for (const line of lines) {
-                  if (/self-proclaimed strength|key differentiator|core strength/i.test(line)) { inStrengths = true; continue; }
-                  if (inStrengths && /pricing|customer|analyst|recent/i.test(line)) break;
-                  if (inStrengths) {
-                    const cleaned = line.replace(/^[\s\-\*\#\d\.]+/, '').trim();
-                    if (cleaned.length > 15) strengthLines.push(cleaned);
-                    if (strengthLines.length >= 3) break;
+                const sectionMatch = websiteResult.match(/##[^#\n]*(?:strength|differentiator)[^\n]*\n([\s\S]{20,800}?)(?=\n##|\n---)/i);
+                if (sectionMatch) {
+                  const subheadings = sectionMatch[1].match(/###[^\n]+/g);
+                  if (subheadings && subheadings.length > 0) {
+                    return subheadings.slice(0, 3).map(s => s.replace(/^###\s*/, '').trim()).join(' · ');
                   }
+                  const lines = sectionMatch[1].split('\n').map(l => l.replace(/^[\s\*\#\-]+/, '').trim()).filter(l => l.length > 15 && !l.startsWith('Source') && !l.startsWith('http'));
+                  return lines.slice(0, 3).join(' · ') || (competitor.known_strengths || 'See research results');
                 }
-                return strengthLines.length > 0 ? strengthLines.join(' · ') : (competitor.known_strengths || 'See research results');
+                return competitor.known_strengths || 'See research results';
               })(),
               sources: websiteResult ? [{ label: 'Competitor website', href: '#' }] : [],
               accessed: new Date().toISOString().split('T')[0]
@@ -473,9 +475,12 @@ exports.handler = async function(event, context) {
             {
               label: 'Known Pricing & Packaging',
               value: (() => {
-                const match = websiteResult.match(/pricing[^:\n]*[:]\s*([^\n]{20,300})/i)
-                  || websiteResult.match(/subscription.based/i);
-                return match ? (typeof match[1] === 'string' ? match[1].replace(/\*+/g, '').trim() : 'Subscription-based') : (competitor.pricing_notes || 'Not publicly disclosed');
+                const sectionMatch = websiteResult.match(/##[^#\n]*(?:pricing|packaging|price)[^\n]*\n([\s\S]{20,800}?)(?=\n##|\n---)/i);
+                if (sectionMatch) {
+                  const lines = sectionMatch[1].split('\n').map(l => l.replace(/^[\s\*\#\-]+/, '').trim()).filter(l => l.length > 15 && !l.startsWith('Source') && !l.startsWith('http') && !l.startsWith('**Source'));
+                  if (lines.length > 0) return lines.slice(0, 3).join(' ');
+                }
+                return competitor.pricing_notes || 'Not publicly disclosed';
               })(),
               sources: websiteResult ? [{ label: 'Competitor website', href: '#' }] : [],
               accessed: new Date().toISOString().split('T')[0]
