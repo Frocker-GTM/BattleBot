@@ -44,9 +44,9 @@ export default function TopNav({ active = 'Dashboard', breadcrumb = null }) {
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 22 }}>
         {['Dashboard', 'Products', 'Battlecards'].map(item => (
-          <span
-            key={item}
-            onClick={() => item === 'Dashboard' && navigate('/dashboard')}
+        <span
+          key={item}
+          onClick={() => navigate('/dashboard')}
             style={{
               fontFamily: 'Josefin Sans', fontWeight: 500,
               textTransform: 'uppercase', letterSpacing: '0.16em', fontSize: 11,

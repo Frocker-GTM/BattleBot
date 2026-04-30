@@ -212,92 +212,230 @@ export default function Viewer() {
 
         {/* Tab 2 — Critical intelligence */}
         {activeTab === 1 && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 32 }}>
-            <div>
-              {/* SWOT */}
-              <h2 className="h-display" style={{ margin: '0 0 20px', fontSize: 20, fontWeight: 300 }}>
-                SWOT — from {competitorName}'s vantage
-              </h2>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 28 }}>
-                {[
-                  { key: 'strengths',     label: 'Strengths',     color: '#86EFAC', bg: 'rgba(74,222,128,0.04)' },
-                  { key: 'weaknesses',    label: 'Weaknesses',    color: '#FCA5A5', bg: 'rgba(239,68,68,0.04)' },
-                  { key: 'opportunities', label: 'Opportunities', color: '#5FA8E8', bg: 'rgba(45,125,210,0.04)' },
-                  { key: 'threats',       label: 'Threats',       color: '#F2C46D', bg: 'rgba(232,160,32,0.04)' },
-                ].map(({ key, label, color, bg }) => (
-                  <div key={key} style={{ background: bg, border: `1px solid ${color}33`, padding: '16px 18px' }}>
-                    <div className="eyebrow" style={{ color, marginBottom: 10 }}>{label}</div>
-                    <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
-                      {(swot[key] || []).map((item, i) => (
-                        <li key={i} style={{
-                          fontSize: 13, lineHeight: 1.55, paddingLeft: 14,
-                          position: 'relative', marginBottom: 8, color: 'var(--text)',
-                        }}>
-                          <span style={{ position: 'absolute', left: 0, top: 8, width: 4, height: 4, background: color }} />
-                          {item}
-                        </li>
-                      ))}
-                      {(!swot[key] || swot[key].length === 0) && (
-                        <li style={{ fontSize: 13, color: 'var(--text-dim)' }}>No data.</li>
-                      )}
-                    </ul>
-                  </div>
-                ))}
+          <div>
+            {/* Product Overview */}
+            <div style={{
+              background: 'var(--bg-raised)', border: '1px solid var(--border)',
+              marginBottom: 18,
+            }}>
+              <div style={{
+                padding: '14px 20px', borderBottom: '1px solid var(--border)',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              }}>
+                <h3 style={{
+                  fontFamily: 'Josefin Sans', fontSize: 12, textTransform: 'uppercase',
+                  letterSpacing: '0.2em', color: 'var(--text-muted)', fontWeight: 600, margin: 0,
+                }}>Product Overview</h3>
+                <div style={{ height: 2, width: 32, background: 'var(--amethyst)' }} />
               </div>
-
-              {/* Analyst positions */}
-              {analyst.placements && analyst.placements.length > 0 && (
-                <>
-                  <h3 className="font-display" style={{
-                    marginBottom: 12, fontSize: 13, textTransform: 'uppercase',
-                    letterSpacing: '0.18em', color: 'var(--text-muted)', fontWeight: 500,
-                  }}>Analyst positions</h3>
-                  <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 20 }}>
-                    {analyst.placements.map((p, i) => (
-                      <div key={i} style={{
-                        padding: '12px 18px', background: 'var(--bg-raised)',
-                        border: '1px solid var(--border)',
-                      }}>
-                        <div style={{ fontSize: 15, fontFamily: 'Josefin Sans', fontWeight: 500 }}>{p.label}</div>
-                        <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 4, fontFamily: 'JetBrains Mono' }}>{p.source}</div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <tbody>
+                  {(version.tab_critical_intelligence?.overview || []).map((row, i) => (
+                    <tr key={i} style={{ borderBottom: '1px solid var(--divider)' }}>
+                      <th style={{
+                        width: 200, padding: '14px 20px', textAlign: 'left', verticalAlign: 'top',
+                        fontFamily: 'Josefin Sans', fontSize: 11, fontWeight: 600,
+                        textTransform: 'uppercase', letterSpacing: '0.15em',
+                        color: 'var(--amethyst-lavender)', background: 'var(--bg-elevated)',
+                      }}>{row.label}</th>
+                      <td style={{ padding: '14px 20px', fontSize: 14, color: 'var(--text)', verticalAlign: 'top' }}>
+                        {row.value}
+                        {row.sources && row.sources.length > 0 && (
+                          <div style={{ marginTop: 6, fontFamily: 'JetBrains Mono', fontSize: 10, color: 'var(--text-dim)' }}>
+                            {row.sources.map((s, j) => (
+                              <span key={j}>
+                                {j > 0 && <span style={{ margin: '0 6px', color: 'var(--border-strong)' }}>·</span>}
+                                <span style={{ color: 'var(--sapphire-sky)' }}>{s.label}</span>
+                              </span>
+                            ))}
+                            {row.accessed && <span style={{ marginLeft: 8 }}>· Accessed {row.accessed}</span>}
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
 
-            {/* Sidebar */}
-            <div>
-              <div style={{ background: 'var(--bg-raised)', border: '1px solid var(--border)', padding: '22px', marginBottom: 16 }}>
-                <div className="eyebrow" style={{ color: 'var(--amber)', marginBottom: 8 }}>Competitor</div>
-                <div className="font-display" style={{ fontSize: 22, fontWeight: 500 }}>{competitorName}</div>
-                {customer.ratings && customer.ratings.length > 0 && (
-                  <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {customer.ratings.map((r, i) => (
-                      <div key={i}>
-                        <div className="eyebrow" style={{ fontSize: 9.5, color: 'var(--text-dim)' }}>{r.label}</div>
-                        <div style={{ fontFamily: 'Josefin Sans', fontSize: 22, fontWeight: 300, marginTop: 2 }}>{r.value}</div>
+            {/* Analyst & Customer Perspectives */}
+            <div style={{
+              background: 'var(--bg-raised)', border: '1px solid var(--border)',
+              marginBottom: 18,
+            }}>
+              <div style={{
+                padding: '14px 20px', borderBottom: '1px solid var(--border)',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              }}>
+                <h3 style={{
+                  fontFamily: 'Josefin Sans', fontSize: 12, textTransform: 'uppercase',
+                  letterSpacing: '0.2em', color: 'var(--text-muted)', fontWeight: 600, margin: 0,
+                }}>Analyst &amp; Customer Perspectives</h3>
+                <div style={{ height: 2, width: 32, background: 'var(--amethyst)' }} />
+              </div>
+              <div style={{ padding: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+
+                {/* Analyst */}
+                <div style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', padding: 20 }}>
+                  <h4 style={{
+                    fontFamily: 'Josefin Sans', fontSize: 11, textTransform: 'uppercase',
+                    letterSpacing: '0.2em', color: 'var(--amethyst-lavender)', marginBottom: 14,
+                    display: 'flex', alignItems: 'center', gap: 10,
+                  }}>
+                    <span style={{
+                      width: 36, height: 36, borderRadius: '50%',
+                      border: '1.5px solid var(--amethyst)',
+                      display: 'grid', placeItems: 'center',
+                      fontFamily: 'Josefin Sans', fontSize: 14, color: 'var(--text)',
+                    }}>A</span>
+                    Overall Analyst Perspective
+                  </h4>
+                  <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 14 }}>
+                    {(analyst.placements || []).map((p, i) => (
+                      <div key={i} style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                        <strong style={{
+                          color: 'var(--text)', fontFamily: 'Josefin Sans', fontWeight: 600,
+                          letterSpacing: 0, textTransform: 'none', fontSize: 13, display: 'block',
+                        }}>{p.label}</strong>
+                        {p.source}
                       </div>
                     ))}
                   </div>
-                )}
-                {analyst.strengths && analyst.strengths.length > 0 && (
-                  <div style={{ borderTop: '1px solid var(--divider)', marginTop: 16, paddingTop: 14 }}>
-                    <div className="eyebrow" style={{ marginBottom: 8 }}>Analyst strengths</div>
-                    {analyst.strengths.map((s, i) => (
-                      <div key={i} style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4 }}>· {s}</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 12 }}>
+                    <div>
+                      <h5 style={{
+                        fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.2em',
+                        color: 'var(--sapphire-sky)', margin: '0 0 6px',
+                        fontFamily: 'Josefin Sans', fontWeight: 600,
+                      }}>Strengths cited</h5>
+                      <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13 }}>
+                        {(analyst.strengths || []).map((s, i) => (
+                          <li key={i} style={{ marginBottom: 4, color: 'var(--text)' }}>{s}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <h5 style={{
+                        fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.2em',
+                        color: 'var(--amber-gold)', margin: '0 0 6px',
+                        fontFamily: 'Josefin Sans', fontWeight: 600,
+                      }}>Cautions cited</h5>
+                      <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13 }}>
+                        {(analyst.cautions || []).map((c, i) => (
+                          <li key={i} style={{ marginBottom: 4, color: 'var(--text)' }}>{c}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Customer */}
+                <div style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', padding: 20 }}>
+                  <h4 style={{
+                    fontFamily: 'Josefin Sans', fontSize: 11, textTransform: 'uppercase',
+                    letterSpacing: '0.2em', color: 'var(--amethyst-lavender)', marginBottom: 14,
+                    display: 'flex', alignItems: 'center', gap: 10,
+                  }}>
+                    <span style={{
+                      width: 36, height: 36, borderRadius: '50%',
+                      border: '1.5px solid var(--amethyst)',
+                      display: 'grid', placeItems: 'center',
+                      fontFamily: 'Josefin Sans', fontSize: 14, color: 'var(--text)',
+                    }}>C</span>
+                    Overall Customer Perspective
+                  </h4>
+                  <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 14 }}>
+                    {(customer.ratings || []).map((r, i) => (
+                      <div key={i} style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                        <strong style={{
+                          color: 'var(--text)', fontFamily: 'Josefin Sans', fontWeight: 600,
+                          letterSpacing: 0, textTransform: 'none', fontSize: 13, display: 'block',
+                        }}>{r.value}</strong>
+                        {r.label}{r.n ? ` · n=${r.n}` : ''}
+                      </div>
                     ))}
                   </div>
-                )}
-                {analyst.cautions && analyst.cautions.length > 0 && (
-                  <div style={{ borderTop: '1px solid var(--divider)', marginTop: 14, paddingTop: 14 }}>
-                    <div className="eyebrow" style={{ marginBottom: 8 }}>Analyst cautions</div>
-                    {analyst.cautions.map((c, i) => (
-                      <div key={i} style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 4 }}>· {c}</div>
-                    ))}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 12 }}>
+                    <div>
+                      <h5 style={{
+                        fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.2em',
+                        color: 'var(--sapphire-sky)', margin: '0 0 6px',
+                        fontFamily: 'Josefin Sans', fontWeight: 600,
+                      }}>Praise themes</h5>
+                      <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13 }}>
+                        {(customer.praise || []).filter(p => !p.includes('See research results')).slice(0, 5).map((p, i) => (
+                          <li key={i} style={{ marginBottom: 4, color: 'var(--text)' }}>{p}</li>
+                        ))}
+                        {(customer.praise || []).every(p => p.includes('See research results')) && (
+                          <li style={{ color: 'var(--text-dim)', fontStyle: 'italic' }}>See research results</li>
+                        )}
+                      </ul>
+                    </div>
+                    <div>
+                      <h5 style={{
+                        fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.2em',
+                        color: 'var(--amber-gold)', margin: '0 0 6px',
+                        fontFamily: 'Josefin Sans', fontWeight: 600,
+                      }}>Complaint themes</h5>
+                      <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13 }}>
+                        {(customer.complaints || []).filter(c => !c.includes('See research results')).slice(0, 5).map((c, i) => (
+                          <li key={i} style={{ marginBottom: 4, color: 'var(--text)' }}>{c}</li>
+                        ))}
+                        {(customer.complaints || []).every(c => c.includes('See research results')) && (
+                          <li style={{ color: 'var(--text-dim)', fontStyle: 'italic' }}>See research results</li>
+                        )}
+                      </ul>
+                    </div>
                   </div>
-                )}
+                </div>
+              </div>
+            </div>
+
+            {/* SWOT */}
+            <div style={{
+              background: 'var(--bg-raised)', border: '1px solid var(--border)',
+              marginBottom: 18,
+            }}>
+              <div style={{
+                padding: '14px 20px', borderBottom: '1px solid var(--border)',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              }}>
+                <h3 style={{
+                  fontFamily: 'Josefin Sans', fontSize: 12, textTransform: 'uppercase',
+                  letterSpacing: '0.2em', color: 'var(--text-muted)', fontWeight: 600, margin: 0,
+                }}>SWOT Summary</h3>
+                <div style={{ height: 2, width: 32, background: 'var(--amethyst)' }} />
+              </div>
+              <div style={{ padding: 2 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, background: 'var(--divider)' }}>
+                  {[
+                    { key: 'strengths',     label: 'Strengths',     color: 'var(--sapphire-sky)',      border: 'var(--sapphire)' },
+                    { key: 'weaknesses',    label: 'Weaknesses',    color: 'var(--amber-gold)',         border: 'var(--amber)' },
+                    { key: 'opportunities', label: 'Opportunities', color: 'var(--amethyst-lavender)',  border: 'var(--amethyst)' },
+                    { key: 'threats',       label: 'Threats',       color: '#B8D9F7',                   border: 'var(--slate)' },
+                  ].map(({ key, label, color, border }) => (
+                    <div key={key} style={{
+                      background: 'var(--bg-raised)', padding: 20, minHeight: 160,
+                      borderLeft: `2px solid ${border}`,
+                    }}>
+                      <h4 style={{
+                        fontFamily: 'Josefin Sans', fontSize: 11, textTransform: 'uppercase',
+                        letterSpacing: '0.22em', color, marginBottom: 14,
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      }}>
+                        {label}
+                        <span style={{ fontFamily: 'JetBrains Mono', fontSize: 10, letterSpacing: 0, color: 'var(--text-dim)' }}>
+                          {(swot[key] || []).length} bullets
+                        </span>
+                      </h4>
+                      <ul style={{ margin: 0, paddingLeft: 16 }}>
+                        {(swot[key] || []).map((item, i) => (
+                          <li key={i} style={{ marginBottom: 8, fontSize: 13, color: 'var(--text)' }}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -306,61 +444,107 @@ export default function Viewer() {
         {/* Tab 3 — FUD responses */}
         {activeTab === 2 && (
           <div>
-            <h2 className="h-display" style={{ margin: '0 0 6px', fontSize: 20, fontWeight: 300 }}>
-              FUD responses &amp; proof points
-            </h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: 13, margin: '0 0 24px' }}>
-              Approved FUD candidates with discovery questions and proof points for field use.
-            </p>
+            <div style={{
+              display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+              marginBottom: 22, paddingBottom: 14, borderBottom: '1px solid var(--divider)',
+            }}>
+              <h2 className="h-display" style={{ margin: 0, fontSize: 20, fontWeight: 300 }}>
+                FUD — Discovery &amp; Response
+              </h2>
+              <span style={{ fontFamily: 'JetBrains Mono', fontSize: 11, color: 'var(--text-dim)' }}>
+                Scope opportunity · Don't attack · Prioritized by strengths
+              </span>
+            </div>
+
             {fudSections.map((section, si) => (
               <div key={si} style={{ marginBottom: 28 }}>
-                <div className="eyebrow" style={{ color: 'var(--amber)', marginBottom: 14 }}>{section.title}</div>
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 14,
+                  marginBottom: 14, paddingBottom: 10, borderBottom: '1px solid var(--divider)',
+                }}>
+                  <span style={{ fontFamily: 'JetBrains Mono', fontSize: 11, color: 'var(--amber)', letterSpacing: '0.1em' }}>
+                    {String(si + 1).padStart(2, '0')}
+                  </span>
+                  <h3 style={{
+                    fontFamily: 'Josefin Sans', fontSize: 14, textTransform: 'uppercase',
+                    letterSpacing: '0.15em', color: 'var(--text)', fontWeight: 500, margin: 0,
+                  }}>{section.title}</h3>
+                  <span style={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: 'var(--text-dim)', marginLeft: 'auto' }}>
+                    {(section.items || []).length} items
+                  </span>
+                </div>
+
                 {(section.items || []).map((item, i) => (
                   <div key={i} style={{
-                    background: 'var(--bg-raised)', border: '1px solid var(--border)',
-                    padding: '20px 24px', marginBottom: 14,
+                    display: 'grid', gridTemplateColumns: '1fr 1fr 1fr',
+                    gap: 2, background: 'var(--divider)',
+                    border: '1px solid var(--border)', marginBottom: 12,
+                    overflow: 'hidden',
                   }}>
-                    <div style={{ display: 'flex', gap: 16 }}>
-                      <span style={{ fontFamily: 'JetBrains Mono', color: 'var(--text-dim)', fontSize: 12, paddingTop: 2 }}>
-                        {String(i + 1).padStart(2, '0')}
-                      </span>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 12 }}>
-                          {item.intelligence}
-                        </div>
-                        {item.discovery_question && (
-                          <div style={{
-                            padding: '10px 14px', marginBottom: 10,
-                            background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.2)',
-                          }}>
-                            <div className="eyebrow" style={{ color: 'var(--amethyst-lavender)', marginBottom: 4 }}>Discovery question</div>
-                            <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6, fontStyle: 'italic' }}>
-                              {item.discovery_question}
-                            </div>
-                          </div>
-                        )}
-                        {item.recommended_response && (
-                          <div style={{
-                            padding: '10px 14px',
-                            background: 'rgba(45,125,210,0.06)', border: '1px solid rgba(45,125,210,0.2)',
-                          }}>
-                            <div className="eyebrow" style={{ color: 'var(--sapphire-sky)', marginBottom: 4 }}>Proof point</div>
-                            <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>
-                              {item.recommended_response}
-                            </div>
-                          </div>
-                        )}
-                        {item.intel_sources && item.intel_sources.length > 0 && (
-                          <div style={{ marginTop: 8, fontFamily: 'JetBrains Mono', fontSize: 11, color: 'var(--text-dim)' }}>
-                            {item.intel_sources.map(s => s.label).join(' · ')}
-                          </div>
-                        )}
+                    {/* Intelligence */}
+                    <div style={{ background: 'var(--bg-raised)', padding: '18px 20px', minHeight: 140 }}>
+                      <div style={{
+                        fontFamily: 'Josefin Sans', fontSize: 10, letterSpacing: '0.22em',
+                        textTransform: 'uppercase', fontWeight: 600, marginBottom: 10,
+                        display: 'flex', alignItems: 'center', gap: 8, color: 'var(--amber)',
+                      }}>
+                        <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'currentColor' }} />
+                        Intelligence
+                        <span style={{
+                          fontFamily: 'JetBrains Mono', fontSize: 9, padding: '2px 6px',
+                          background: item.priority === 'high' ? 'rgba(232,160,32,0.15)' : 'rgba(139,92,246,0.15)',
+                          color: item.priority === 'high' ? 'var(--amber-gold)' : 'var(--amethyst-lavender)',
+                          letterSpacing: '0.08em', textTransform: 'uppercase', marginLeft: 'auto',
+                        }}>{item.priority_label}</span>
                       </div>
+                      <p style={{ margin: '0 0 8px', fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>
+                        {item.intelligence}
+                      </p>
+                      {item.intel_sources && item.intel_sources.length > 0 && (
+                        <div style={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: 'var(--text-dim)' }}>
+                          {item.intel_sources.map(s => s.label).join(' · ')}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Discovery Question */}
+                    <div style={{ background: 'var(--bg-raised)', padding: '18px 20px', minHeight: 140 }}>
+                      <div style={{
+                        fontFamily: 'Josefin Sans', fontSize: 10, letterSpacing: '0.22em',
+                        textTransform: 'uppercase', fontWeight: 600, marginBottom: 10,
+                        display: 'flex', alignItems: 'center', gap: 8, color: 'var(--sapphire-sky)',
+                      }}>
+                        <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'currentColor' }} />
+                        Discovery Question
+                      </div>
+                      <p style={{ margin: 0, fontSize: 13, color: 'var(--text)', lineHeight: 1.6, fontStyle: 'normal' }}>
+                        <span style={{ color: 'var(--sapphire-sky)', fontSize: 16, marginRight: 2 }}>"</span>
+                        {item.discovery_question}
+                        <span style={{ color: 'var(--sapphire-sky)', fontSize: 16, marginLeft: 2 }}>"</span>
+                      </p>
+                    </div>
+
+                    {/* Recommended Response */}
+                    <div style={{ background: 'var(--bg-raised)', padding: '18px 20px', minHeight: 140 }}>
+                      <div style={{
+                        fontFamily: 'Josefin Sans', fontSize: 10, letterSpacing: '0.22em',
+                        textTransform: 'uppercase', fontWeight: 600, marginBottom: 10,
+                        display: 'flex', alignItems: 'center', gap: 8, color: 'var(--amethyst-lavender)',
+                      }}>
+                        <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'currentColor' }} />
+                        Recommended Response
+                      </div>
+                      <p style={{ margin: 0, fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>
+                        <span style={{ color: 'var(--amethyst-lavender)', fontSize: 16, marginRight: 2 }}>"</span>
+                        {item.recommended_response}
+                        <span style={{ color: 'var(--amethyst-lavender)', fontSize: 16, marginLeft: 2 }}>"</span>
+                      </p>
                     </div>
                   </div>
                 ))}
               </div>
             ))}
+
             {fudSections.length === 0 && (
               <div style={{ color: 'var(--text-dim)', fontSize: 13 }}>No FUD data available.</div>
             )}

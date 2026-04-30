@@ -16,7 +16,7 @@ export default function Dashboard() {
       if (!user) return
       const [{ data: prods }, { data: cards }] = await Promise.all([
         supabase.from('user_products').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-        supabase.from('battlecards').select('*').order('updated_at', { ascending: false }),
+        supabase.from('battlecards').select('*, user_products(product_name), competitor_profiles(company_name)').order('updated_at', { ascending: false }),
       ])
       setProducts(prods || [])
       setBattlecards(cards || [])
@@ -119,10 +119,10 @@ export default function Dashboard() {
                 borderBottom: '1px solid var(--divider)', cursor: 'pointer',
               }}>
                 <div style={{ fontFamily: 'Josefin Sans', fontSize: 15, fontWeight: 500, letterSpacing: '0.01em' }}>
-                  {card.product_name}
+                  {card.user_products?.product_name || card.product_name || '…'}
                 </div>
                 <div style={{ fontFamily: 'Josefin Sans', fontSize: 15, fontWeight: 500, color: 'var(--amber-gold)' }}>
-                  vs {card.competitor_name}
+                  vs {card.competitor_profiles?.company_name || card.competitor_name || '…'}
                 </div>
                 <StatusBadge status={card.status} />
                 <div style={{ fontFamily: 'JetBrains Mono', fontSize: 12, color: 'var(--text-muted)' }}>—</div>
