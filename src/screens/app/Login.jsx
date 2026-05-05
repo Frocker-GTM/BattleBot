@@ -124,21 +124,6 @@ export default function Login() {
         </form>
 
         <div style={{
-          marginTop: 28, paddingTop: 22, borderTop: '1px solid var(--divider)',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          fontSize: 13, color: 'var(--text-muted)',
-        }}>
-          <span>No account yet?</span>
-          <Link to="/signup" style={{
-            color: 'var(--sapphire-sky)',
-            fontFamily: 'Josefin Sans', fontWeight: 500,
-            textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 11,
-          }}>
-            Sign up →
-          </Link>
-        </div>
-
-        <div style={{
           position: 'absolute', bottom: -28, left: 0, right: 0,
           textAlign: 'center', color: 'var(--text-dim)',
           fontFamily: 'JetBrains Mono', fontSize: 10.5, letterSpacing: '0.04em',

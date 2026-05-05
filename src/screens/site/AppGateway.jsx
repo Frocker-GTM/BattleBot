@@ -74,6 +74,7 @@ export default function AppGateway() {
             {[
               { label: 'Home',  path: '/' },
               { label: 'About', path: '/about' },
+              { label: 'Art',   path: '/art' },
               { label: 'App',   path: '/app', active: true },
             ].map(({ label, path, active }) => (
               <a key={label} href={path} style={{

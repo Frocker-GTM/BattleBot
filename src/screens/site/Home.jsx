@@ -45,17 +45,14 @@ export default function Home() {
               letterSpacing: '0.22em', fontSize: '0.82rem', fontWeight: 500,
             }}>
               Bryan Finfrock
-              <em style={{
-                fontStyle: 'normal', color: 'var(--text-dim)',
-                fontWeight: 300, marginLeft: '0.55rem',
-              }}>FIN Consulting</em>
             </span>
           </div>
           <nav style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
             {[
-              { label: 'Home', path: '/', active: true },
+              { label: 'Home',  path: '/', active: true },
               { label: 'About', path: '/about' },
-              { label: 'App', path: '/app' },
+              { label: 'Art',   path: '/art' },
+              { label: 'App',   path: '/app' },
             ].map(({ label, path, active }) => (
               <a key={label} href={path} style={{
                 fontFamily: 'Josefin Sans', textTransform: 'uppercase',
@@ -79,7 +76,7 @@ export default function Home() {
       }}>
         <div style={{ maxWidth: 780 }}>
           <div className="eyebrow" style={{ marginBottom: '1.5rem' }}>
-            Product Marketing · B2B SaaS
+            Product Marketing Leader · Go-to-Market Strategist · Creative Problem-Solver
           </div>
 
           <h1 style={{
@@ -88,7 +85,7 @@ export default function Home() {
             letterSpacing: '-0.01em', lineHeight: 0.95,
             margin: '0 0 1.5rem',
           }}>
-            Bryan<br />Finfrock.
+            Bryan<br />Finfrock
           </h1>
 
           <p style={{
@@ -97,9 +94,9 @@ export default function Home() {
             color: 'var(--text-dim)', letterSpacing: '0.02em',
             margin: '0 0 0.75rem',
           }}>
-            GTM strategist.
+            Understand Value.
             <span style={{ color: 'var(--amber)', marginLeft: '0.5rem' }}>
-              Asks better questions.
+              Deliver better positioning and messaging.
             </span>
           </p>
 
@@ -116,10 +113,23 @@ export default function Home() {
             color: 'var(--text-dim)', maxWidth: '64ch',
             margin: '0 0 2.5rem',
           }}>
-            15+ years building product marketing and GTM motions for enterprise
-            B2B SaaS and Martech — Oracle, Marigold, Beanworks. Currently open
-            to Director and Senior PMM roles in Martech, AI, and enterprise SaaS.
-            Remote.
+            I'm a product marketing leader with 15+ years in B2B SaaS and Martech, currently seeking my next opportunity.
+          </p>
+
+          <p style={{
+            fontSize: '1rem', lineHeight: 1.7,
+            color: 'var(--text-dim)', maxWidth: '64ch',
+            margin: '0 0 2.5rem',
+          }}>
+            This site was built in collaboration with tools like Canva, ChatGPT, and Claude to share my creativity, my work, and what I'm building now.
+          </p>
+
+          <p style={{
+            fontSize: '1rem', lineHeight: 1.7,
+            color: 'var(--text-dim)', maxWidth: '64ch',
+            margin: '0 0 2.5rem',
+          }}>
+            Take a look around. The ABOUT page goes beyond the resume and LinkedIn profile. The ART page is a portfolio of my acrylic paintings. The APP page hosts my Competitive BattleBot — an AI-powered tool that simplifies the assembly of competitive battlecards. I'd love to give you a live demo.
           </p>
 
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
@@ -164,10 +174,10 @@ export default function Home() {
           paddingTop: '3rem',
         }}>
           {[
-            { value: '8×',   label: 'Analyst inquiry growth' },
-            { value: '4×',   label: 'Briefing growth' },
-            { value: '#1',   label: "Google ranking, 'campaign management'" },
-            { value: '15+',  label: 'Years in B2B SaaS' },
+            { value: '15+', label: 'Years in B2B SaaS' },
+            { value: '#1',  label: "Google keyword rank for 'campaign management'" },
+            { value: '8×',  label: 'Analyst inquiry growth' },
+            { value: '4×',  label: 'Briefing growth' },
           ].map(({ value, label }) => (
             <div key={label}>
               <div style={{
@@ -209,9 +219,9 @@ export default function Home() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
             {[
               { label: 'Currently',  value: 'Open to Director and Senior PMM roles. Remote.' },
-              { label: 'Focus',      value: 'Martech, AI, enterprise SaaS GTM' },
+              { label: 'Expertise',  value: 'Enterprise SaaS, AI, Martech, Customer Experience (CX)' },
               { label: 'Building',   value: 'BattleBot — competitive battlecard agent' },
-              { label: 'Background', value: 'USAF veteran · Weather Forecaster' },
+              { label: 'Service',    value: 'USAF veteran · Weather Forecaster' },
             ].map(({ label, value }) => (
               <div key={label}>
                 <div className="eyebrow" style={{ marginBottom: '0.4rem' }}>{label}</div>
@@ -238,12 +248,12 @@ export default function Home() {
             fontFamily: 'JetBrains Mono', fontSize: '0.72rem',
             color: 'var(--text-dim)', letterSpacing: '0.04em',
           }}>
-            FIN CONSULTING / / BRYAN FINFROCK / / © 2026
+            BRYAN FINFROCK / / © 2026
           </div>
           <div style={{ display: 'flex', gap: '1.6rem' }}>
             {[
-              { label: 'LinkedIn', href: 'https://linkedin.com/in/bryanfinfrock' },
-              { label: 'Email',    href: 'mailto:hello@finfrock.co' },
+              { label: 'LinkedIn',  href: 'https://linkedin.com/in/bryanfinfrock' },
+              { label: 'Email',     href: 'mailto:bryan.finfrock@gmail.com' },
               { label: 'BattleBot', href: '/app' },
             ].map(({ label, href }) => (
               <a key={label} href={href} style={{

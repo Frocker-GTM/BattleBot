@@ -5,6 +5,7 @@ import { supabase } from './lib/supabase.js'
 // Site screens
 import Home from './screens/site/Home.jsx'
 import About from './screens/site/About.jsx'
+import Art from './pages/Art'
 import AppGateway from './screens/site/AppGateway.jsx'
 
 // App screens
@@ -43,6 +44,7 @@ export default function App() {
       {/* Public site */}
       <Route path="/" element={<Home />} />
       <Route path="/about" element={<About />} />
+	  <Route path="/art" element={<Art />} />
       <Route path="/app" element={<AppGateway />} />
 
       {/* Auth */}

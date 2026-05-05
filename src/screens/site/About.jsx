@@ -38,15 +38,13 @@ export default function About() {
               letterSpacing: '0.22em', fontSize: '0.82rem', fontWeight: 500,
             }}>
               Bryan Finfrock
-              <em style={{ fontStyle: 'normal', color: 'var(--text-dim)', fontWeight: 300, marginLeft: '0.55rem' }}>
-                FIN Consulting
-              </em>
             </span>
           </div>
           <nav style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
             {[
               { label: 'Home',  path: '/' },
               { label: 'About', path: '/about', active: true },
+              { label: 'Art',   path: '/art' },
               { label: 'App',   path: '/app' },
             ].map(({ label, path, active }) => (
               <a key={label} href={path} style={{
@@ -145,13 +143,13 @@ export default function About() {
                   date: '2022 — MARIGOLD',
                   title: 'Projected Open Rate',
                   sub: 'Apple MPP mitigation',
-                  body: 'Co-developed the industry\'s response to Apple Mail Privacy Protection. Engineered with product and deliverability; positioned with sales and analysts. Braze followed months later. The fix outlived the post.',
+                  body: "Co-developed the industry's response to Apple Mail Privacy Protection. Engineered with product and deliverability; positioned with sales and analysts. Braze followed months later. The fix outlived the post.",
                 },
                 {
                   date: '2018–21 — ORACLE',
                   title: 'Responsys Advanced Intelligence',
                   sub: 'Sole PMM architect',
-                  body: 'Built the GTM foundation for Oracle Responsys\'s ML-powered personalization suite. The authority page I wrote for \'campaign management\' still ranks #1 on Google — I wrote it by asking what marketers were trying to learn, not what the product did.',
+                  body: "Built the GTM foundation for Oracle Responsys's ML-powered personalization suite. The authority page I wrote for 'campaign management' still ranks #1 on Google — I wrote it by asking what marketers were trying to learn, not what the product did.",
                 },
                 {
                   date: '2021–23 — MARIGOLD',
@@ -160,10 +158,10 @@ export default function About() {
                   body: 'Built the analyst program from the ground up. 8× inquiry growth, 4× briefing growth. Unified siloed PMM teams across multiple brands and turned analyst conversations into product feedback loops.',
                 },
                 {
-                  date: '2003–09 — USAF',
+                  date: 'United States Air Force',
                   title: 'Weather Forecaster',
                   sub: 'United States Air Force',
-                  body: 'Learned to make confident decisions from incomplete data — and to never confuse a forecast with a guarantee. Operating philosophy: intrinsic execution over extrinsic hope.',
+                  body: 'Learned to make confident decisions from incomplete data, and to never confuse a forecast with a guarantee. Operating philosophy: intrinsic execution over extrinsic hope.',
                 },
               ].map(({ date, title, sub, body }) => (
                 <div key={title} style={{
@@ -204,11 +202,11 @@ export default function About() {
               {[
                 {
                   n: '01', title: 'Positioning & messaging',
-                  body: "April Dunford's 10-step framework as a working tool, not a recital. Customer's question first; company's answer second.",
+                  body: 'Understand the value by asking customers about problems and offering a solution.',
                 },
                 {
                   n: '02', title: 'AI & ML GTM',
-                  body: 'Translating model behavior into outcomes a buyer can defend in their own meeting. Oracle Responsys AI suite. BattleBot today.',
+                  body: 'Translating tool utilization into a scalable operating framework to serve the entire organization.',
                 },
                 {
                   n: '03', title: 'Analyst relations',
@@ -260,7 +258,7 @@ export default function About() {
                 fontWeight: 300, fontSize: '1.1rem', color: 'var(--amber)',
                 letterSpacing: '0.04em', lineHeight: 1.3,
               }}>
-                Better questions beat better answers.
+                Better questions produce better answers.
               </div>
             </div>
             <div>
@@ -271,7 +269,7 @@ export default function About() {
                 keep looking.
               </p>
               <p style={{ fontSize: '1rem', lineHeight: 1.75, color: 'var(--text-dim)', marginBottom: '1.5rem' }}>
-                Most GTM problems aren't answer problems — they're question problems. The wrong question
+                Most GTM problems are solved by asking the right question at the right time. The wrong question
                 produces a confident, useless answer. The right question rewrites the brief. So I start every
                 engagement at the customer's question, not the company's answer. The work that follows tends
                 to be quieter, more accurate, and harder to copy.
@@ -297,9 +295,9 @@ export default function About() {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               {[
-                { n: '01', label: 'LinkedIn', value: 'linkedin.com/in/bryanfinfrock', href: 'https://linkedin.com/in/bryanfinfrock' },
-                { n: '02', label: 'Email',    value: 'hello@finfrock.co',             href: 'mailto:hello@finfrock.co' },
-                { n: '03', label: 'See the work', value: 'BattleBot platform',        href: '/app' },
+                { n: '01', label: 'LinkedIn',     value: 'linkedin.com/in/bryanfinfrock', href: 'https://linkedin.com/in/bryanfinfrock' },
+                { n: '02', label: 'Email',         value: 'bryan.finfrock@gmail.com',      href: 'mailto:bryan.finfrock@gmail.com' },
+                { n: '03', label: 'See the work',  value: 'BattleBot platform',             href: '/app' },
               ].map(({ n, label, value, href }) => (
                 <a key={n} href={href} style={{
                   display: 'flex', alignItems: 'center', gap: '1.5rem',
@@ -344,7 +342,7 @@ export default function About() {
             fontFamily: 'JetBrains Mono', fontSize: '0.72rem',
             color: 'var(--text-dim)', letterSpacing: '0.04em',
           }}>
-            FIN CONSULTING / / BRYAN FINFROCK / / © 2026
+            BRYAN FINFROCK / / © 2026
           </div>
           <div style={{ display: 'flex', gap: '1.6rem' }}>
             {[
