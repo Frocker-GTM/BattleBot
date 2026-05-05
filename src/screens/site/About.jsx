@@ -284,6 +284,63 @@ export default function About() {
           </div>
         </div>
 
+{/* Hobbies */}
+        <div style={{ marginBottom: '5rem', borderBottom: '1px solid rgba(75,101,132,0.25)', paddingBottom: '4rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '4rem' }}>
+            <div>
+              <div className="eyebrow" style={{ marginBottom: '0.75rem' }}>Interests & Hobbies</div>
+              <div style={{ fontSize: '0.85rem', color: 'var(--text-dim)', lineHeight: 1.6 }}>
+                What I do to unwind.
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+              {[
+                {
+                  n: '01', title: 'Family',
+                  body: 'My wife and I enjoy any time we spend with our two daughters.',
+                },
+                {
+                  n: '02', title: 'Live Events',
+                  body: 'We love concerts and live entertainment. Our daughters have joined us for everything from Andrew Bird to The Violent Femmes',
+                },
+                {
+                  n: '03', title: 'Chickens',
+                  body: 'Our backyard coop has more than a dozen hens and a rooster named Randall.',
+                },
+                {
+                  n: '04', title: 'Gardening',
+                  body: 'Fruits, veggies, bushes, trees, and vines. Garlic is my favorite to grow, but taters always occupy most of my time.',
+                },
+                {
+                  n: '05', title: 'Reading',
+                  body: 'I like to mix a wide variety of fiction into the mix of professional literature.',
+                },
+                {
+                  n: '06', title: 'Technology',
+                  body: 'Whether it is Nintendo Switch time with my daughters or coding time with Claude, I love exploring and utilizing technology.',
+                },
+              ].map(({ n, title, body }) => (
+                <div key={n} style={{
+                  padding: '1.25rem', background: 'var(--bg-raised)',
+                  border: '1px solid var(--border)',
+                }}>
+                  <div style={{
+                    fontFamily: 'JetBrains Mono', fontSize: '0.7rem',
+                    color: 'var(--text-dim)', marginBottom: '0.5rem',
+                  }}>{n}</div>
+                  <div style={{
+                    fontFamily: 'Josefin Sans', fontSize: '0.95rem',
+                    fontWeight: 500, letterSpacing: '0.04em', marginBottom: '0.6rem',
+                    textTransform: 'uppercase',
+                  }}>{title}</div>
+                  <p style={{ fontSize: '0.85rem', lineHeight: 1.65, color: 'var(--text-dim)', margin: 0 }}>{body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+
         {/* Contact */}
         <div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '4rem' }}>
