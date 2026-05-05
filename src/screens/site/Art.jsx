@@ -7,11 +7,11 @@ import { useState } from 'react'
 // ─────────────────────────────────────────────
 const PAINTINGS = [
   { src: '/art/hummingbird.jpg', title: 'Ruby Throated Friend' },
-  { src: '/art/bird.jpg', title: 'Watching the Sunset' },
+  { src: '/art/bird.jpeg', title: 'Watching the Sunset' },
   { src: '/art/carpediem.jpg', title: 'Sieze the Day' },
-  { src: '/art/penguin.jpg', title: 'An Angry Penguin' },
+  { src: '/art/penguin.jpeg', title: 'An Angry Penguin' },
   { src: '/art/adultsupervision.jpg', title: 'Adult Supervision Required' },
-  { src: '/art/moon.jpg', title: 'Office Mural' },
+  { src: '/art/moon.jpeg', title: 'Office Mural' },
 ]
 
 export default function Art() {
