@@ -115,7 +115,7 @@ export default function Art() {
             marginTop: '1.5rem', fontSize: '1rem', lineHeight: 1.7,
             color: 'var(--text-dim)', maxWidth: '56ch',
           }}>
-            Aphantasia is the inability to voluntarily create mental images in one's "mind's eye". Yet, my creative spirit requires satiation, which took me on an artistic journey. What began with a digital camera and simple editing tools has evolved into a passion for digital photography and arcylic painting. Click any piece to view it full size.
+            Aphantasia is the inability to voluntarily create mental images in one's "mind's eye". Yet, my creative spirit requires satiation, which took me on an artistic journey. What began with a digital camera and simple editing tools has evolved into a passion for digital photography and acrylic painting. Click any piece to view it full size.
           </p>
         </div>
 
