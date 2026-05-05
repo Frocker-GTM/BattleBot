@@ -6,12 +6,12 @@ import { useState } from 'react'
 // Images go in: public/art/ in your local project folder
 // ─────────────────────────────────────────────
 const PAINTINGS = [
-  { src: '/art/painting-01.jpg', title: 'Painting Title 1' },
-  { src: '/art/painting-02.jpg', title: 'Painting Title 2' },
-  { src: '/art/painting-03.jpg', title: 'Painting Title 3' },
-  { src: '/art/painting-04.jpg', title: 'Painting Title 4' },
-  { src: '/art/painting-05.jpg', title: 'Painting Title 5' },
-  { src: '/art/painting-06.jpg', title: 'Painting Title 6' },
+  { src: '/art/hummingbird.jpg', title: 'Ruby Throated Friend' },
+  { src: '/art/bird.jpg', title: 'Watching the Sunset' },
+  { src: '/art/carpediem.jpg', title: 'Sieze the Day' },
+  { src: '/art/penguin.jpg', title: 'An Angry Penguin' },
+  { src: '/art/adultsupervision.jpg', title: 'Adult Supervision Required' },
+  { src: '/art/moon.jpg', title: 'Office Mural' },
 ]
 
 export default function Art() {
@@ -104,7 +104,7 @@ export default function Art() {
             letterSpacing: '0.02em', lineHeight: 1.1,
             margin: '0 0 0.75rem',
           }}>
-            Acrylic paintings.
+            Digital Photography & Acrylic Paintings.
           </h1>
           <div style={{
             height: 1,
@@ -115,7 +115,7 @@ export default function Art() {
             marginTop: '1.5rem', fontSize: '1rem', lineHeight: 1.7,
             color: 'var(--text-dim)', maxWidth: '56ch',
           }}>
-            A portfolio of original acrylic paintings. Click any piece to view it full size.
+            Aphantasia is the inability to voluntarily create mental images in one's "mind's eye". Yet, my creative spirit requires satiation, which took me on an artistic journey. What began with a digital camera and simple editing tools has evolved into a passion for digital photography and arcylic painting. Click any piece to view it full size.
           </p>
         </div>
 
