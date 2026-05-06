@@ -255,6 +255,11 @@ export default function Assembly() {
               Re-run scoring
             </button>
           )}
+          {scoringStatus === 'complete' && !scoringConfirmed && (
+            <button className="bb-btn-ghost" style={{ fontSize: 11, padding: '6px 14px' }} onClick={handleRunScoring}>
+              Re-run scoring
+            </button>
+          )}
           {scoringStatus === 'complete' && useCases.length > 0 && !scoringConfirmed && (
             <>
               <div style={{ marginBottom: 18 }}>
