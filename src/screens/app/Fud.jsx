@@ -39,6 +39,7 @@ export default function Fud() {
       .from('research_results')
       .select('id, result')
       .eq('competitor_id', competitorId)
+      .eq('product_name', productId)
       .eq('mode', 'fud_analysis')
       .eq('status', 'complete')
       .order('created_at', { ascending: false })

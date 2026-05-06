@@ -34,6 +34,7 @@ export default function Assembly() {
     // Load existing scoring result
     supabase.from('research_results').select('result')
       .eq('competitor_id', competitorId)
+      .eq('product_name', productId)
       .eq('mode', 'battlecard_scoring')
       .eq('status', 'complete')
       .order('created_at', { ascending: false })
@@ -52,6 +53,7 @@ export default function Assembly() {
     // Load existing SWOT result
     supabase.from('research_results').select('result')
       .eq('competitor_id', competitorId)
+      .eq('product_name', productId)
       .eq('mode', 'battlecard_swot')
       .eq('status', 'complete')
       .order('created_at', { ascending: false })
@@ -247,6 +249,11 @@ export default function Assembly() {
               <span style={{ color: 'var(--status-error)', fontSize: 13 }}>Scoring failed.</span>
               <button className="bb-btn-ghost" onClick={handleRunScoring}>Retry</button>
             </div>
+          )}
+          {scoringStatus === 'complete' && !scoringConfirmed && (
+            <button className="bb-btn-ghost" style={{ fontSize: 11, padding: '6px 14px' }} onClick={handleRunScoring}>
+              Re-run scoring
+            </button>
           )}
           {scoringStatus === 'complete' && useCases.length > 0 && !scoringConfirmed && (
             <>
