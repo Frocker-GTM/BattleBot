@@ -470,13 +470,15 @@ Produce the FUD analysis JSON now.`;
       const job_id = `fud_${competitorId}_${Date.now()}`;
 
       // Create job row
-      await supabase.from('research_results').insert({
+      const { error: insertError } = await supabase.from('research_results').insert({
         job_id,
         mode: 'fud_analysis',
         competitor: competitorId,
         product_name: productId,
+        competitor_id: competitorId,
         status: 'pending'
       });
+      if (insertError) throw new Error(`Failed to create FUD job: ${JSON.stringify(insertError)}`);
 
       // Trigger background function
       await fetch(`${process.env.URL}/.netlify/functions/fud-background`, {
