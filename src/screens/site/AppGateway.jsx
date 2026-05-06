@@ -66,7 +66,7 @@ export default function AppGateway() {
             }}>
               Bryan Finfrock
               <em style={{ fontStyle: 'normal', color: 'var(--text-dim)', fontWeight: 300, marginLeft: '0.55rem' }}>
-                FIN Consulting
+                
               </em>
             </span>
           </div>
