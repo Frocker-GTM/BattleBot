@@ -9,6 +9,7 @@ export default function Dashboard() {
   const [products, setProducts] = useState([])
   const [battlecards, setBattlecards] = useState([])
   const [loading, setLoading] = useState(true)
+  const [deleteConfirm, setDeleteConfirm] = useState(null)
 
   useEffect(() => {
     async function load() {
@@ -24,6 +25,21 @@ export default function Dashboard() {
     }
     load()
   }, [])
+
+  async function handleDeleteProduct(product) {
+    await supabase.from('battlecards').delete().eq('product_id', product.id)
+    await supabase.from('user_products').delete().eq('id', product.id)
+    setProducts(prev => prev.filter(p => p.id !== product.id))
+    setBattlecards(prev => prev.filter(c => c.product_id !== product.id))
+    setDeleteConfirm(null)
+  }
+
+  async function handleDeleteBattlecard(card) {
+    await supabase.from('battlecard_versions').delete().eq('battlecard_id', card.id)
+    await supabase.from('battlecards').delete().eq('id', card.id)
+    setBattlecards(prev => prev.filter(c => c.id !== card.id))
+    setDeleteConfirm(null)
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', flexDirection: 'column' }}>
@@ -68,7 +84,15 @@ export default function Dashboard() {
                   background: 'var(--bg-raised)', border: '1px solid var(--border)',
                   padding: '20px 22px', cursor: 'pointer',
                 }}>
-                  <div className="eyebrow" style={{ color: 'var(--text-dim)', marginBottom: 8 }}>{p.category}</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div className="eyebrow" style={{ color: 'var(--text-dim)', marginBottom: 8 }}>{p.category}</div>
+                    <span
+                      onClick={e => { e.stopPropagation(); setDeleteConfirm({ type: 'product', item: p }) }}
+                      style={{
+                        fontFamily: 'Josefin Sans', fontSize: 11, color: 'var(--status-error)',
+                        cursor: 'pointer', letterSpacing: '0.1em',
+                      }}>✕</span>
+                  </div>
                   <div className="font-display" style={{ fontSize: 20, fontWeight: 500, letterSpacing: '0.02em' }}>
                     {p.product_name}
                   </div>
@@ -92,7 +116,7 @@ export default function Dashboard() {
         {/* Battlecards table */}
         <div id="battlecards" style={{ overflow: 'auto' }}>
           <div style={{
-            display: 'grid', gridTemplateColumns: '1.4fr 1.4fr 140px 90px 140px 80px',
+            display: 'grid', gridTemplateColumns: '1.4fr 1.4fr 140px 140px 80px',
             gap: 16, padding: '20px 22px', borderBottom: '1px solid var(--border)',
             fontFamily: 'Josefin Sans', textTransform: 'uppercase',
             letterSpacing: '0.16em', fontSize: 10.5, color: 'var(--text-dim)', fontWeight: 500,
@@ -100,7 +124,6 @@ export default function Dashboard() {
             <span>Product</span>
             <span>Competitor</span>
             <span>Status</span>
-            <span>FUD items</span>
             <span>Updated</span>
             <span></span>
           </div>
@@ -114,7 +137,7 @@ export default function Dashboard() {
           ) : (
             battlecards.map(card => (
               <div key={card.id} onClick={() => navigate(`/battlecard/${card.id}`)} style={{
-                display: 'grid', gridTemplateColumns: '1.4fr 1.4fr 140px 90px 140px 80px',
+                display: 'grid', gridTemplateColumns: '1.4fr 1.4fr 140px 140px 80px',
                 alignItems: 'center', gap: 16, padding: '16px 22px',
                 borderBottom: '1px solid var(--divider)', cursor: 'pointer',
               }}>
@@ -125,15 +148,21 @@ export default function Dashboard() {
                   vs {card.competitor_profiles?.company_name || card.competitor_name || '…'}
                 </div>
                 <StatusBadge status={card.status} />
-                <div style={{ fontFamily: 'JetBrains Mono', fontSize: 12, color: 'var(--text-muted)' }}>—</div>
                 <div style={{ fontFamily: 'JetBrains Mono', fontSize: 12, color: 'var(--text-muted)' }}>
                   {new Date(card.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                 </div>
-                <div style={{
-                  textAlign: 'right', fontFamily: 'Josefin Sans',
-                  textTransform: 'uppercase', letterSpacing: '0.14em',
-                  fontSize: 11, color: 'var(--sapphire-sky)',
-                }}>Open →</div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 14 }}>
+                  <span style={{
+                    fontFamily: 'Josefin Sans', textTransform: 'uppercase',
+                    letterSpacing: '0.14em', fontSize: 11, color: 'var(--sapphire-sky)',
+                  }}>Open →</span>
+                  <span
+                    onClick={e => { e.stopPropagation(); setDeleteConfirm({ type: 'battlecard', item: card }) }}
+                    style={{
+                      fontFamily: 'Josefin Sans', fontSize: 11,
+                      color: 'var(--status-error)', cursor: 'pointer',
+                    }}>✕</span>
+                </div>
               </div>
             ))
           )}
@@ -148,5 +177,46 @@ export default function Dashboard() {
 
       </div>
     </div>
+
+      {deleteConfirm && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 100,
+          background: 'rgba(8,10,18,0.85)', backdropFilter: 'blur(6px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <div style={{
+            width: 420, background: 'var(--bg-raised)',
+            border: '1px solid var(--border)', padding: '32px 36px',
+          }}>
+            <div className="eyebrow" style={{ color: 'var(--status-error)', marginBottom: 12 }}>
+              — Confirm delete
+            </div>
+            <div style={{ fontFamily: 'Josefin Sans', fontSize: 18, fontWeight: 500, marginBottom: 12 }}>
+              {deleteConfirm.type === 'product'
+                ? `Delete ${deleteConfirm.item.product_name}?`
+                : `Delete this battlecard?`}
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 24 }}>
+              {deleteConfirm.type === 'product'
+                ? 'This will permanently delete the product profile and any battlecards associated with it. Competitor profiles and research data will not be affected.'
+                : 'This will permanently delete the battlecard and all its versions. Research data will not be affected.'}
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button className="bb-btn-ghost"
+                style={{ flex: 1, padding: 12, fontSize: 12, borderColor: 'var(--status-error)', color: 'var(--status-error)' }}
+                onClick={() => deleteConfirm.type === 'product'
+                  ? handleDeleteProduct(deleteConfirm.item)
+                  : handleDeleteBattlecard(deleteConfirm.item)}>
+                Delete permanently
+              </button>
+              <button className="bb-btn-ghost"
+                style={{ flex: 1, padding: 12, fontSize: 12 }}
+                onClick={() => setDeleteConfirm(null)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
   )
 }

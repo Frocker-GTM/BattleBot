@@ -18,6 +18,7 @@ export default function Fud() {
   const [candidates, setCandidates] = useState([])
   const [proofPoints, setProofPoints] = useState({})
   const [savingProof, setSavingProof] = useState({})
+  const [rowId, setRowId] = useState(null)
   const poller = useRef(null)
 
   useEffect(() => {
@@ -36,7 +37,7 @@ export default function Fud() {
     console.log('loadCandidates called with competitorId:', competitorId)
     const { data } = await supabase
       .from('research_results')
-      .select('result')
+      .select('id, result')
       .eq('competitor_id', competitorId)
       .eq('mode', 'fud_analysis')
       .eq('status', 'complete')
@@ -51,8 +52,27 @@ export default function Fud() {
           ? JSON.parse(data.result)
           : data.result
         setCandidates(parsed.fud_candidates || [])
+        setRowId(data.id)
       } catch {}
     }
+  }
+
+  async function persistCandidates(updatedCandidates) {
+    if (!rowId) return
+    const { data: current } = await supabase
+      .from('research_results')
+      .select('result')
+      .eq('id', rowId)
+      .single()
+    if (!current) return
+    const parsed = typeof current.result === 'string'
+      ? JSON.parse(current.result)
+      : current.result
+    parsed.fud_candidates = updatedCandidates
+    await supabase
+      .from('research_results')
+      .update({ result: JSON.stringify(parsed) })
+      .eq('id', rowId)
   }
 
   async function handleRunFud() {
@@ -96,26 +116,32 @@ export default function Fud() {
   }
 
   async function handleApprove(candidate) {
-    setCandidates(prev => prev.map(c =>
+    const updated = candidates.map(c =>
       c.source === candidate.source && c.weakness_summary === candidate.weakness_summary
         ? { ...c, status: 'approved' }
         : c
-    ))
+    )
+    setCandidates(updated)
+    await persistCandidates(updated)
   }
 
   async function handleArchive(candidate) {
-    setCandidates(prev => prev.filter(c =>
+    const updated = candidates.filter(c =>
       !(c.source === candidate.source && c.weakness_summary === candidate.weakness_summary)
-    ))
+    )
+    setCandidates(updated)
+    await persistCandidates(updated)
   }
 
   async function handleSaveProof(candidate) {
     setSavingProof(prev => ({ ...prev, [candidate.source]: true }))
-    setCandidates(prev => prev.map(c =>
+    const updated = candidates.map(c =>
       c.source === candidate.source && c.weakness_summary === candidate.weakness_summary
         ? { ...c, proof_point: proofPoints[candidate.source] || '' }
         : c
-    ))
+    )
+    setCandidates(updated)
+    await persistCandidates(updated)
     setSavingProof(prev => ({ ...prev, [candidate.source]: false }))
   }
 

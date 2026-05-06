@@ -316,22 +316,7 @@ export default function AppGateway() {
               </button>
             </form>
 
-            <div style={{
-              marginTop: 20, paddingTop: 18, borderTop: '1px solid var(--divider)',
-              display: 'flex', justifyContent: 'space-between',
-              fontSize: 13, color: 'var(--text-muted)',
-            }}>
-              <span>{authMode === 'login' ? 'No account?' : 'Already onboard?'}</span>
-              <span
-                onClick={() => { setAuthMode(authMode === 'login' ? 'signup' : 'login'); setError(null) }}
-                style={{
-                  color: 'var(--sapphire-sky)', cursor: 'pointer',
-                  fontFamily: 'Josefin Sans', fontWeight: 500,
-                  textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 11,
-                }}>
-                {authMode === 'login' ? 'Sign up →' : '← Sign in'}
-              </span>
-            </div>
+            
           </div>
         </div>
       )}

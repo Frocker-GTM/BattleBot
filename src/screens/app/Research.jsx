@@ -44,6 +44,7 @@ export default function Research() {
   })
 
   const pollers = useRef({})
+  const [deleteConfirm, setDeleteConfirm] = useState(null)
 
   // Load product + all competitor profiles on mount
   useEffect(() => {
@@ -224,6 +225,38 @@ export default function Research() {
     }
   }
 
+  async function handleDeleteResearch(source) {
+    const jobId = jobs[source].jobId
+    if (!jobId) return
+    const { data: rows } = await supabase
+      .from('research_results')
+      .select('id')
+      .eq('job_id', jobId)
+    if (rows && rows.length > 0) {
+      await supabase.from('research_results').delete().eq('job_id', jobId)
+    }
+    setJobs(prev => ({
+      ...prev,
+      [source]: { status: 'pending', result: null, expanded: false, jobId: null }
+    }))
+  }
+
+  async function handleDeleteCompetitor(comp) {
+    await supabase.from('research_results').delete().eq('competitor_id', comp.id)
+    await supabase.from('competitor_profiles').delete().eq('id', comp.id)
+    setCompetitors(prev => prev.filter(c => c.id !== comp.id))
+    setDeleteConfirm(null)
+    if (competitor?.id === comp.id) {
+      setCompetitor(null)
+      setJobs({
+        g2:            { status: 'pending', result: null, expanded: false, jobId: null },
+        trustradius:   { status: 'pending', result: null, expanded: false, jobId: null },
+        gartner_peers: { status: 'pending', result: null, expanded: false, jobId: null },
+        website:       { status: 'pending', result: null, expanded: false, jobId: null },
+      })
+    }
+  }
+
   function toggleExpanded(source) {
     setJobs(prev => ({ ...prev, [source]: { ...prev[source], expanded: !prev[source].expanded } }))
   }
@@ -317,10 +350,19 @@ export default function Research() {
                           {c.product_name}
                         </div>
                       </div>
-                      <span style={{
-                        fontFamily: 'Josefin Sans', textTransform: 'uppercase',
-                        letterSpacing: '0.14em', fontSize: 11, color: 'var(--sapphire-sky)',
-                      }}>Select →</span>
+                      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                        <span style={{
+                          fontFamily: 'Josefin Sans', textTransform: 'uppercase',
+                          letterSpacing: '0.14em', fontSize: 11, color: 'var(--sapphire-sky)',
+                        }}>Select →</span>
+                        <span
+                          onClick={e => { e.stopPropagation(); setDeleteConfirm(c) }}
+                          style={{
+                            fontFamily: 'Josefin Sans', textTransform: 'uppercase',
+                            letterSpacing: '0.14em', fontSize: 11, color: 'var(--status-error)',
+                            cursor: 'pointer',
+                          }}>✕</span>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -509,13 +551,20 @@ export default function Research() {
                       </div>
                       <div style={{ textAlign: 'right' }}>
                         {job.status === 'complete' ? (
-                          <span onClick={() => toggleExpanded(source)} style={{
-                            fontFamily: 'Josefin Sans', textTransform: 'uppercase',
-                            letterSpacing: '0.14em', fontSize: 11,
-                            color: 'var(--sapphire-sky)', cursor: 'pointer',
-                          }}>
-                            {job.expanded ? 'Hide ↑' : 'View →'}
-                          </span>
+                          <div style={{ display: 'flex', gap: 14, justifyContent: 'flex-end', alignItems: 'center' }}>
+                            <span onClick={() => toggleExpanded(source)} style={{
+                              fontFamily: 'Josefin Sans', textTransform: 'uppercase',
+                              letterSpacing: '0.14em', fontSize: 11,
+                              color: 'var(--sapphire-sky)', cursor: 'pointer',
+                            }}>
+                              {job.expanded ? 'Hide ↑' : 'View →'}
+                            </span>
+                            <span onClick={() => handleDeleteResearch(source)} style={{
+                              fontFamily: 'Josefin Sans', textTransform: 'uppercase',
+                              letterSpacing: '0.14em', fontSize: 11,
+                              color: 'var(--status-error)', cursor: 'pointer',
+                            }}>✕</span>
+                          </div>
                         ) : job.status === 'running' ? (
                           <span style={{ fontFamily: 'JetBrains Mono', fontSize: 11, color: 'var(--text-dim)' }}>
                             polling…
@@ -573,5 +622,40 @@ export default function Research() {
         )}
       </div>
     </div>
+
+      {deleteConfirm && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 100,
+          background: 'rgba(8,10,18,0.85)', backdropFilter: 'blur(6px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <div style={{
+            width: 420, background: 'var(--bg-raised)',
+            border: '1px solid var(--border)', padding: '32px 36px',
+          }}>
+            <div className="eyebrow" style={{ color: 'var(--status-error)', marginBottom: 12 }}>
+              — Confirm delete
+            </div>
+            <div style={{ fontFamily: 'Josefin Sans', fontSize: 18, fontWeight: 500, marginBottom: 12 }}>
+              Delete {deleteConfirm.company_name}?
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 24 }}>
+              This will permanently delete the competitor profile and all associated research results. This cannot be undone.
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button className="bb-btn-ghost"
+                style={{ flex: 1, padding: 12, fontSize: 12, borderColor: 'var(--status-error)', color: 'var(--status-error)' }}
+                onClick={() => handleDeleteCompetitor(deleteConfirm)}>
+                Delete permanently
+              </button>
+              <button className="bb-btn-ghost"
+                style={{ flex: 1, padding: 12, fontSize: 12 }}
+                onClick={() => setDeleteConfirm(null)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
   )
 }
