@@ -329,7 +329,6 @@ exports.handler = async function(event, context) {
           // Extract praise themes — look for numbered praise sections
           const praiseSection = r.result.match(/praise|strength|positive|pros?|what.*like/i);
           if (praiseSection) {
-            // Extract bullet points or numbered items after praise heading
             const lines = r.result.split('\n');
             let inPraise = false;
             let praiseCount = 0;
@@ -407,6 +406,50 @@ exports.handler = async function(event, context) {
         });
       }
 
+      // Extract overview fields using Claude for clean, accurate output
+      const today = new Date().toISOString().split('T')[0];
+      const defaultOverview = [
+        { label: 'Product Name', value: `${competitor.product_name}`, sources: [{ label: 'Competitor website', href: '#' }], accessed: today },
+        { label: 'Ideal Customer Profile', value: 'See research results', sources: [], accessed: today },
+        { label: 'Core Messaging', value: 'See research results', sources: [], accessed: today },
+        { label: 'Self-Proclaimed Strengths', value: 'See research results', sources: [], accessed: today },
+        { label: 'Known Pricing & Packaging', value: 'Not publicly disclosed', sources: [], accessed: today }
+      ];
+
+      let overview = defaultOverview;
+      if (websiteResult) {
+        try {
+          const overviewResponse = await fetch("https://api.anthropic.com/v1/messages", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": process.env.ANTHROPIC_API_KEY,
+              "anthropic-version": "2023-06-01"
+            },
+            body: JSON.stringify({
+              model: "claude-sonnet-4-6",
+              max_tokens: 1024,
+              messages: [{
+                role: "user",
+                content: `Extract the following five fields from this competitor website research. Return ONLY a valid JSON object with these exact keys. No markdown, no preamble, no asterisks in values.\n\n{"product_name":"The competitor product name only, not company name","ideal_customer_profile":"1-2 sentences describing who they target","core_messaging":"Their main value proposition in 1-2 sentences, plain text only","self_proclaimed_strengths":"3-4 key strengths they claim separated by middle dot ·","known_pricing":"Pricing structure if available otherwise Not publicly disclosed"}\n\nRESEARCH:\n${websiteResult.substring(0, 3000)}`
+              }]
+            })
+          });
+          const overviewData = await overviewResponse.json();
+          const raw = overviewData.content[0].text.replace(/```json|```/g, '').trim();
+          const extracted = JSON.parse(raw);
+          overview = [
+            { label: 'Product Name', value: extracted.product_name || competitor.product_name, sources: [{ label: 'Competitor website', href: '#' }], accessed: today },
+            { label: 'Ideal Customer Profile', value: extracted.ideal_customer_profile || 'See research results', sources: [{ label: 'Competitor website', href: '#' }], accessed: today },
+            { label: 'Core Messaging', value: extracted.core_messaging || 'See research results', sources: [{ label: 'Competitor website', href: '#' }], accessed: today },
+            { label: 'Self-Proclaimed Strengths', value: extracted.self_proclaimed_strengths || 'See research results', sources: [{ label: 'Competitor website', href: '#' }], accessed: today },
+            { label: 'Known Pricing & Packaging', value: extracted.known_pricing || 'Not publicly disclosed', sources: [{ label: 'Competitor website', href: '#' }], accessed: today }
+          ];
+        } catch(e) {
+          overview = defaultOverview;
+        }
+      }
+
       // Build the complete template JSON
       const battlecardData = {
         header: {
@@ -415,7 +458,7 @@ exports.handler = async function(event, context) {
             ? competitor.product_name
             : `${competitor.company_name} ${competitor.product_name}`,
           deck_subtitle: `Competitive intelligence for ${competitor.company_name} ${competitor.product_name} deals`,
-          publish_date: new Date().toISOString().split('T')[0],
+          publish_date: today,
           refresh_cadence: 'Monthly',
           pmm_owner: 'PMM Team',
           staleness: 'CURRENT',
@@ -425,71 +468,7 @@ exports.handler = async function(event, context) {
         },
         tab1_use_cases: scoringData.scored_use_cases || scoringData,
         tab2: {
-          overview: [
-            {
-              label: 'Product Name',
-              value: `${competitor.company_name} ${competitor.product_name}`,
-              sources: [{ label: 'Competitor website', href: '#' }],
-              accessed: new Date().toISOString().split('T')[0]
-            },
-            {
-              label: 'Ideal Customer Profile',
-              value: (() => {
-                const sectionMatch = websiteResult.match(/##[^#\n]*(?:ideal customer|icp|target(?:ed)? customer)[^\n]*\n([\s\S]{20,600}?)(?=\n##|\n---|\z)/i);
-                if (sectionMatch) {
-                  const lines = sectionMatch[1].split('\n').map(l => l.replace(/^[\s\*\#\-]+/, '').trim()).filter(l => l.length > 15 && !l.startsWith('Source') && !l.startsWith('http'));
-                  if (lines.length > 0) return lines.slice(0, 3).join(' ');
-                }
-                return competitor.icp || competitor.target_customer_size || 'See research results';
-              })(),
-              sources: websiteResult ? [{ label: 'Competitor website', href: '#' }] : [],
-              accessed: new Date().toISOString().split('T')[0]
-            },
-            {
-              label: 'Core Messaging',
-              value: (() => {
-                const sectionMatch = websiteResult.match(/##[^#\n]*(?:value proposition|tagline|positioning|messaging)[^\n]*\n([\s\S]{20,400}?)(?=\n##|\n---)/i);
-                if (sectionMatch) {
-                  const lines = sectionMatch[1].split('\n').map(l => l.replace(/^[\s\*\#\-]+/, '').trim()).filter(l => l.length > 15 && !l.startsWith('Source') && !l.startsWith('http'));
-                  if (lines.length > 0) return lines[0].replace(/\*+/g, '').trim();
-                }
-                const boldMatch = websiteResult.match(/\*\*[""]([^""]{20,300})[""]\*\*/);
-                return boldMatch ? boldMatch[1] : (competitor.positioning || 'See research results');
-              })(),
-              sources: websiteResult ? [{ label: 'Competitor website', href: '#' }] : [],
-              accessed: new Date().toISOString().split('T')[0]
-            },
-            {
-              label: 'Self-Proclaimed Strengths',
-              value: (() => {
-                const sectionMatch = websiteResult.match(/##[^#\n]*(?:strength|differentiator)[^\n]*\n([\s\S]{20,800}?)(?=\n##|\n---)/i);
-                if (sectionMatch) {
-                  const subheadings = sectionMatch[1].match(/###[^\n]+/g);
-                  if (subheadings && subheadings.length > 0) {
-                    return subheadings.slice(0, 3).map(s => s.replace(/^###\s*/, '').trim()).join(' · ');
-                  }
-                  const lines = sectionMatch[1].split('\n').map(l => l.replace(/^[\s\*\#\-]+/, '').trim()).filter(l => l.length > 15 && !l.startsWith('Source') && !l.startsWith('http'));
-                  return lines.slice(0, 3).join(' · ') || (competitor.known_strengths || 'See research results');
-                }
-                return competitor.known_strengths || 'See research results';
-              })(),
-              sources: websiteResult ? [{ label: 'Competitor website', href: '#' }] : [],
-              accessed: new Date().toISOString().split('T')[0]
-            },
-            {
-              label: 'Known Pricing & Packaging',
-              value: (() => {
-                const sectionMatch = websiteResult.match(/##[^#\n]*(?:pricing|packaging|price)[^\n]*\n([\s\S]{20,800}?)(?=\n##|\n---)/i);
-                if (sectionMatch) {
-                  const lines = sectionMatch[1].split('\n').map(l => l.replace(/^[\s\*\#\-]+/, '').trim()).filter(l => l.length > 15 && !l.startsWith('Source') && !l.startsWith('http') && !l.startsWith('**Source'));
-                  if (lines.length > 0) return lines.slice(0, 3).join(' ');
-                }
-                return competitor.pricing_notes || 'Not publicly disclosed';
-              })(),
-              sources: websiteResult ? [{ label: 'Competitor website', href: '#' }] : [],
-              accessed: new Date().toISOString().split('T')[0]
-            }
-          ],
+          overview,
           analyst: {
             placements: analystPlacements,
             strengths: analystStrengths.slice(0, 3),
@@ -517,10 +496,10 @@ exports.handler = async function(event, context) {
       let battlecardId;
 
       if (existingCard) {
-        // Archive current version
+        // Insert new version with incremented version number
         await supabase.from('battlecard_versions').insert({
           battlecard_id: existingCard.id,
-          version_number: existingCard.current_version,
+          version_number: existingCard.current_version + 1,
           tab_use_case: battlecardData.tab1_use_cases,
           tab_critical_intelligence: { ...battlecardData.tab2, header: battlecardData.header },
           tab_fud: battlecardData.tab3_fud_sections,
@@ -586,7 +565,8 @@ exports.handler = async function(event, context) {
         message: `Battlecard assembled for **${product.product_name} vs ${competitor.company_name} ${competitor.product_name}**.\n\nAll three tabs populated and saved to database.`
       });
     }
-// ─────────────────────────────────────────────
+
+    // ─────────────────────────────────────────────
     // MODE: get_battlecard
     // Returns battlecard data for the viewer
     // ─────────────────────────────────────────────
@@ -614,6 +594,7 @@ exports.handler = async function(event, context) {
         changed_at: version.changed_at
       });
     }
+
     return respond(400, {
       error: "Invalid mode. Use: create_scoring_job, confirm_use_case_scores, create_swot_job, confirm_swot, assemble_battlecard"
     });

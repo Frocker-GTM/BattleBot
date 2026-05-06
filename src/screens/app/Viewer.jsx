@@ -282,12 +282,6 @@ export default function Viewer() {
                     letterSpacing: '0.2em', color: 'var(--amethyst-lavender)', marginBottom: 14,
                     display: 'flex', alignItems: 'center', gap: 10,
                   }}>
-                    <span style={{
-                      width: 36, height: 36, borderRadius: '50%',
-                      border: '1.5px solid var(--amethyst)',
-                      display: 'grid', placeItems: 'center',
-                      fontFamily: 'Josefin Sans', fontSize: 14, color: 'var(--text)',
-                    }}>A</span>
                     Overall Analyst Perspective
                   </h4>
                   <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 14 }}>
@@ -336,12 +330,6 @@ export default function Viewer() {
                     letterSpacing: '0.2em', color: 'var(--amethyst-lavender)', marginBottom: 14,
                     display: 'flex', alignItems: 'center', gap: 10,
                   }}>
-                    <span style={{
-                      width: 36, height: 36, borderRadius: '50%',
-                      border: '1.5px solid var(--amethyst)',
-                      display: 'grid', placeItems: 'center',
-                      fontFamily: 'Josefin Sans', fontSize: 14, color: 'var(--text)',
-                    }}>C</span>
                     Overall Customer Perspective
                   </h4>
                   <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 14 }}>
@@ -424,13 +412,10 @@ export default function Viewer() {
                         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                       }}>
                         {label}
-                        <span style={{ fontFamily: 'JetBrains Mono', fontSize: 10, letterSpacing: 0, color: 'var(--text-dim)' }}>
-                          {(swot[key] || []).length} bullets
-                        </span>
                       </h4>
-                      <ul style={{ margin: 0, paddingLeft: 16 }}>
+                      <ul style={{ margin: 0, paddingLeft: 16, listStyleType: 'disc' }}>
                         {(swot[key] || []).map((item, i) => (
-                          <li key={i} style={{ marginBottom: 8, fontSize: 13, color: 'var(--text)' }}>{item}</li>
+                          <li key={i} style={{ marginBottom: 8, fontSize: 13, color: 'var(--text)', paddingLeft: 4 }}>{item}</li>
                         ))}
                       </ul>
                     </div>
