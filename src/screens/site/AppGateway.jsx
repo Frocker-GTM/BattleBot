@@ -99,14 +99,14 @@ export default function AppGateway() {
 
         {/* Page header */}
         <div style={{ marginBottom: '4rem' }}>
-          <div className="eyebrow" style={{ marginBottom: '1rem', color: 'var(--amber)' }}>03 / APP</div>
+          <div className="eyebrow" style={{ marginBottom: '1rem', color: 'var(--amber)' }}>04 / APP</div>
           <h1 style={{
             fontFamily: 'Josefin Sans', fontWeight: 300,
             fontSize: 'clamp(2.25rem, 4vw, 3.5rem)',
             letterSpacing: '0.02em', lineHeight: 1.1,
             margin: '0 0 1rem',
           }}>
-            The work, in working form.
+            Combining expertise with functionality.
           </h1>
           <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
             <span style={{
@@ -120,9 +120,7 @@ export default function AppGateway() {
             maxWidth: '60ch', fontSize: '1rem', lineHeight: 1.75,
             color: 'var(--text-dim)', marginTop: '1.5rem',
           }}>
-            Most PMM portfolios talk about the work. This one runs it. BattleBot is a competitive
-            battlecard agent I built to demonstrate how I leverage AI in real GTM work — and to give
-            myself a tool I'd want to use as a Director of Product Marketing.
+            Most portfolios (like the ART page) share samples of past work. This one runs it. BattleBot began as a curiosity. Can I transform best practices for a standard process into an AI-powered workflow? With each little bug that I removed from the initial build, I had another new idea to improve it. This serves as a great example of how my creativity and passion for marketing come to life. If you’re looking to add a full-time Product Marketing Manager to your team, I’d love to give you a demo.  
           </p>
         </div>
 
@@ -143,7 +141,7 @@ export default function AppGateway() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
               <div>
                 <div className="eyebrow" style={{ color: 'var(--amber)', marginBottom: '0.5rem' }}>
-                  APP / 001 · Flagship
+                  AI APP / 001 · Competitive Intelligence
                 </div>
                 <h2 style={{
                   fontFamily: 'Josefin Sans', fontWeight: 300,
@@ -159,13 +157,11 @@ export default function AppGateway() {
             </div>
 
             <p style={{ fontSize: '0.9rem', lineHeight: 1.7, color: 'var(--text-dim)', marginBottom: '1.5rem' }}>
-              A competitive battlecard agent — three-tab cards, human in the loop, weighted source
-              intelligence. Automates warmup, taxonomy resolution, async web research, analyst report
-              processing, FUD gap analysis, use-case scoring, and SWOT generation.
+              Team up with Claude to reduce production time and expand knowledge. The Battlebot application is a Human-in-the-Loop tool to conduct research and prepare an insightful, relevant Battlecard to help revenue teams close deals faster.
             </p>
 
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
-              {['React + Vite', 'Supabase', 'Netlify Functions', 'Anthropic API'].map(tag => (
+              {['ICP', 'Customer Reviews', 'Analyst Evaluations', 'Fear, Uncertainty, Doubt'].map(tag => (
                 <span key={tag} style={{
                   fontFamily: 'JetBrains Mono', fontSize: '0.7rem',
                   padding: '0.25rem 0.6rem',
@@ -210,7 +206,7 @@ export default function AppGateway() {
             padding: '2rem',
           }}>
             <div className="eyebrow" style={{ color: 'var(--text-dim)', marginBottom: '0.5rem' }}>
-              APP / 002
+              NEXT / 002
             </div>
             <h2 style={{
               fontFamily: 'Josefin Sans', fontWeight: 300,
@@ -219,11 +215,10 @@ export default function AppGateway() {
               color: 'var(--text-dim)',
             }}>More agents in build.</h2>
             <p style={{ fontSize: '0.9rem', lineHeight: 1.7, color: 'var(--text-dim)', marginBottom: '1.5rem' }}>
-              The BattleBot pattern — async research, human-in-the-loop, source-weighted reasoning —
-              generalizes. Next surfaces under exploration:
+              The BattleBot was just step one. Items on the roadmap include:
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-              {['Analyst delta — Wave & MQ version comparison', 'Win/loss theme synthesis', 'Message testing'].map(item => (
+              {['Product Positioning Workflow', 'Differentiation Validator', 'Analyst Report Summarizer', 'Win/Loss Reality Check'].map(item => (
                 <div key={item} style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                   <div style={{ width: 4, height: 4, background: 'rgba(75,101,132,0.5)' }} />
                   <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>{item}</span>
@@ -357,12 +352,12 @@ export default function AppGateway() {
             fontFamily: 'JetBrains Mono', fontSize: '0.72rem',
             color: 'var(--text-dim)', letterSpacing: '0.04em',
           }}>
-            FIN CONSULTING / / BRYAN FINFROCK / / © 2026
+            BRYAN FINFROCK / / © 2026
           </div>
           <div style={{ display: 'flex', gap: '1.6rem' }}>
             {[
               { label: 'LinkedIn',  href: 'https://linkedin.com/in/bryanfinfrock' },
-              { label: 'Email',     href: 'mailto:hello@finfrock.co' },
+              { label: 'Email',     href: 'mailto:bryan.finfrock@gmail.com' },
               { label: 'BattleBot', href: '/app' },
             ].map(({ label, href }) => (
               <a key={label} href={href} style={{

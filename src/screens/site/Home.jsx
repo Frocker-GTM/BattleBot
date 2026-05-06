@@ -75,7 +75,8 @@ export default function Home() {
         paddingBottom: 'clamp(4rem, 8vw, 7rem)',
       }}>
         <div style={{ maxWidth: 780 }}>
-          <div className="eyebrow" style={{ marginBottom: '1.5rem' }}>
+          <div className="eyebrow" style={{ marginBottom: '1rem', color: 'var(--amber)' }}>01 / HOME</div>
+		  <div className="eyebrow" style={{ marginBottom: '1.5rem' }}>
             Product Marketing Leader · Go-to-Market Strategist · Creative Problem-Solver
           </div>
 
@@ -87,7 +88,11 @@ export default function Home() {
           }}>
             Bryan<br />Finfrock
           </h1>
-
+		  <div style={{
+            height: 1,
+            background: 'linear-gradient(90deg, var(--amber), transparent)',
+            width: 120, marginTop: '1.5rem',
+          }} />
           <p style={{
             fontFamily: 'Josefin Sans', fontWeight: 300,
             fontSize: 'clamp(1.1rem, 2vw, 1.4rem)',
@@ -205,7 +210,7 @@ export default function Home() {
           <div>
             <div className="eyebrow" style={{ marginBottom: '1.25rem' }}>Operating ground</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
-              {['Martech', 'AI & ML GTM', 'Analyst Relations', 'Sales Enablement', 'Positioning'].map(tag => (
+              {['B2B SaaS', 'AI & ML GTM', 'Analyst Relations', 'Sales Enablement', 'Positioning'].map(tag => (
                 <span key={tag} style={{
                   fontFamily: 'Josefin Sans', textTransform: 'uppercase',
                   letterSpacing: '0.16em', fontSize: '0.72rem',

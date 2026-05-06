@@ -313,7 +313,7 @@ export default function About() {
                 },
                 {
                   n: '05', title: 'Reading',
-                  body: 'I like to mix a wide variety of fiction into the mix of professional literature.',
+                  body: 'I like to mix a wide variety of fiction in with the assortment of professional literature.',
                 },
                 {
                   n: '06', title: 'Technology',
