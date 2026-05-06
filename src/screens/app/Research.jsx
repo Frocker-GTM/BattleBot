@@ -621,8 +621,6 @@ export default function Research() {
           </>
         )}
       </div>
-    </div>
-
       {deleteConfirm && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 100,

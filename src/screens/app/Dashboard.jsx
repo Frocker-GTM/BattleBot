@@ -176,7 +176,7 @@ export default function Dashboard() {
         </div>
 
       </div>
-    {deleteConfirm && (
+      {deleteConfirm && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 100,
           background: 'rgba(8,10,18,0.85)', backdropFilter: 'blur(6px)',
