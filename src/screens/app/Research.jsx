@@ -657,5 +657,6 @@ export default function Research() {
           </div>
         </div>
       )}
+    </div>
   )
 }
