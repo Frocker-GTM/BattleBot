@@ -141,7 +141,7 @@ export default function About() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {[
               { n: '01', label: 'Samples', value: 'A Google Drive of past work samples.', href: 'https://drive.google.com/drive/folders/1hNOoRyl7ugK3EZ-01qVwAmwq1LNQpfYB?usp=drive_link' },
-              { n: '02', label: 'The Hero's Pitch',   value: 'A Reference Guide for Narrative Assembly.',   href: '/heropitch' },
+              { n: '02', label: 'The Hero\u2019s Pitch',   value: 'A Reference Guide for Narrative Assembly.',   href: '/heropitch' },
             ].map(({ n, label, value, href }) => (
               <a key={n} href={href} target="_blank" rel="noreferrer" style={{
                 display: 'flex', alignItems: 'center', gap: '1.5rem',
