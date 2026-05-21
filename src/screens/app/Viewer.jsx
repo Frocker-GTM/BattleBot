@@ -190,7 +190,7 @@ export default function Viewer() {
                             <HarveyBall value={sub.our_score || 0} size={16} color="#5FA8E8" />
                           </span>
                           <span style={{ textAlign: 'center' }}>
-                            <HarveyBall value={sub.their_score || 0} size={16} color="#F2C46D" />
+                            <HarveyBall value={sub.their_score || 0} size={16} color="var(--acid-lime)" />
                           </span>
                           <span style={{ fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.5 }}>
                             {sub.rationale}
