@@ -120,7 +120,7 @@ export default function AppGateway() {
             maxWidth: '60ch', fontSize: '1rem', lineHeight: 1.75,
             color: 'var(--text-dim)', marginTop: '1.5rem',
           }}>
-            Most portfolios (like the ART page) share samples of past work. This one runs it. BattleBot began as a curiosity. Can I transform best practices for a standard process into an AI-powered workflow? With each little bug that I removed from the initial build, I had another new idea to improve it. This serves as a great example of how my creativity and passion for marketing come to life. If you’re looking to add a full-time Product Marketing Manager to your team, I’d love to give you a demo.  
+            Battlebot turns competitive research from a multi-day project into a minutes-long workflow. Start by collaborating with Claude to build a robust positioning profile for your product. Then send Battlebot to a competitor's website to isolate their ICP, self-proclaimed strengths, and pricing and packaging. Pull in customer reviews from G2, TrustRadius, or Gartner Peer Insights. Feed it analysts' reports. Each stage that once took hours or days now takes minutes. The output: a fully assembled battlecard, ready for your sales team. If you're looking to add a Product Marketing Manager who builds tools like this, I'd love to give you a demo.
           </p>
         </div>
 

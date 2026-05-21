@@ -137,14 +137,11 @@ export default function About() {
         }}>
           <div>
             <div className="eyebrow" style={{ marginBottom: '0.75rem' }}>Examples of Work</div>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-dim)', lineHeight: 1.6 }}>
-              The work, in practice.
-            </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {[
-              { n: '01', label: 'Samples Folder', value: 'Google Drive', href: 'https://drive.google.com/drive/folders/1hNOoRyl7ugK3EZ-01qVwAmwq1LNQpfYB?usp=drive_link' },
-              { n: '02', label: 'Storytelling',   value: 'Hero Pitch',   href: '/heropitch' },
+              { n: '01', label: 'Samples', value: 'A Google Drive of past work samples.', href: 'https://drive.google.com/drive/folders/1hNOoRyl7ugK3EZ-01qVwAmwq1LNQpfYB?usp=drive_link' },
+              { n: '02', label: 'The Hero's Pitch',   value: 'A Reference Guide for Narrative Assembly.',   href: '/heropitch' },
             ].map(({ n, label, value, href }) => (
               <a key={n} href={href} target="_blank" rel="noreferrer" style={{
                 display: 'flex', alignItems: 'center', gap: '1.5rem',

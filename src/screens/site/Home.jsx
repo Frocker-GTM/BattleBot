@@ -126,7 +126,7 @@ export default function Home() {
             color: 'var(--text-dim)', maxWidth: '64ch',
             margin: '0 0 2.5rem',
           }}>
-            This site was built in collaboration with tools like Canva, ChatGPT, and Claude to share my creativity, my work, and what I'm building now.
+            This site is an AI-assisted portfolio showcasing my technical, professional, and creative skills.
           </p>
 
           <p style={{
@@ -134,7 +134,7 @@ export default function Home() {
             color: 'var(--text-dim)', maxWidth: '64ch',
             margin: '0 0 2.5rem',
           }}>
-            Take a look around. The ABOUT page goes beyond the resume and LinkedIn profile. The ART page is a portfolio of my acrylic paintings. The APP page hosts my Competitive BattleBot — an AI-powered tool that simplifies the assembly of competitive battlecards. I'd love to give you a live demo.
+            There's a thread running through everything here: creative thinking in service of a strategy. The ART page shows it literally: a progression from digital photography to acrylic painting. The ABOUT page tells the professional story behind it, with work samples. The APP page hosts an AI-powered research tool that builds competitive battlecards. I'd love to walk you through it.
           </p>
 
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
