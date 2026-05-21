@@ -157,20 +157,20 @@ export default function Fud() {
       <TopNav active="Dashboard" breadcrumb={
         <><span>{product?.product_name || '…'}</span>
         <span style={{ color: 'var(--text-dim)' }}>·</span>
-        <span style={{ color: 'var(--amber-gold)' }}>vs {competitorName}</span>
+        <span style={{ color: 'var(--acid-lime)' }}>vs {competitorName}</span>
         <span style={{ color: 'var(--text-dim)' }}>·</span>
         <span>FUD</span></>
       } />
 
       {/* Header */}
       <div style={{ padding: '32px 44px 24px', borderBottom: '1px solid var(--divider)' }}>
-        <div className="eyebrow" style={{ color: 'var(--amber)', marginBottom: 10 }}>— FUD analysis</div>
+        <div className="eyebrow" style={{ color: 'var(--acid-lime)', marginBottom: 10 }}>— FUD analysis</div>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
           <div>
             <h1 className="h-display" style={{ margin: 0, fontSize: 32, fontWeight: 300 }}>
               {product?.product_name || '…'}
               <span style={{ color: 'var(--text-dim)', margin: '0 16px' }}>vs.</span>
-              <span style={{ color: 'var(--amber-gold)' }}>{competitorName}</span>
+              <span style={{ color: 'var(--acid-lime)' }}>{competitorName}</span>
             </h1>
             <p style={{ margin: '8px 0 0', color: 'var(--text-muted)', fontSize: 13 }}>
               Approve FUD candidates and complete proof points before assembly.
@@ -300,7 +300,7 @@ export default function Fud() {
           marginTop: 8,
         }}>
           <div>
-            <div className="eyebrow" style={{ color: 'var(--amber)', marginBottom: 6 }}>Next</div>
+            <div className="eyebrow" style={{ color: 'var(--acid-lime)', marginBottom: 6 }}>Next</div>
             <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>
               {approvedWithProof > 0
                 ? `${approvedWithProof} candidate${approvedWithProof !== 1 ? 's' : ''} approved with proof points. Ready for assembly.`
@@ -308,7 +308,7 @@ export default function Fud() {
             </div>
           </div>
           <button
-            className="bb-btn-amber"
+            className="bb-btn-acid-lime"
             disabled={approvedWithProof === 0}
             style={{ opacity: approvedWithProof > 0 ? 1 : 0.4 }}
             onClick={() => navigate(`/assembly/${productId}/${competitorId}`)}>

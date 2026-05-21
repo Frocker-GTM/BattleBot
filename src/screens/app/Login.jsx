@@ -63,16 +63,16 @@ export default function Login() {
         {['tl','tr','bl','br'].map(p => (
           <div key={p} style={{
             position: 'absolute', width: 10, height: 10,
-            borderColor: 'var(--amber)', borderStyle: 'solid', borderWidth: 0,
+            borderColor: 'var(--acid-lime)', borderStyle: 'solid', borderWidth: 0,
             ...(p.includes('t') ? { top: -1, borderTopWidth: 1 } : { bottom: -1, borderBottomWidth: 1 }),
             ...(p.includes('l') ? { left: -1, borderLeftWidth: 1 } : { right: -1, borderRightWidth: 1 }),
           }} />
         ))}
 
         <div style={{ marginBottom: 36 }}>
-          <div className="eyebrow" style={{ marginBottom: 14, color: 'var(--amber)' }}>— Sign in</div>
+          <div className="eyebrow" style={{ marginBottom: 14, color: 'var(--acid-lime)' }}>— Sign in</div>
           <h1 className="h-display" style={{ fontSize: 38, margin: 0, fontWeight: 300, lineHeight: 1.05 }}>
-            Welcome<br/><span style={{ color: 'var(--amber)' }}>Back.</span>
+            Welcome<br/><span style={{ color: 'var(--acid-lime)' }}>Back.</span>
           </h1>
           <p style={{ color: 'var(--text-muted)', marginTop: 18, fontSize: 14, lineHeight: 1.55 }}>
             Pick up where you left off. Your products, competitors, and battlecards are waiting.

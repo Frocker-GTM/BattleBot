@@ -37,7 +37,7 @@ export default function Home() {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
             <div style={{
-              width: 8, height: 8, background: 'var(--amber)',
+              width: 8, height: 8, background: 'var(--acid-lime)',
               transform: 'rotate(45deg)',
             }} />
             <span style={{
@@ -59,7 +59,7 @@ export default function Home() {
                 letterSpacing: '0.22em', fontSize: '0.78rem', fontWeight: 400,
                 color: active ? 'var(--text)' : 'var(--text-dim)',
                 textDecoration: 'none', padding: '0.4rem 0',
-                borderBottom: active ? '1px solid var(--amber)' : '1px solid transparent',
+                borderBottom: active ? '1px solid var(--acid-lime)' : '1px solid transparent',
               }}>{label}</a>
             ))}
           </nav>
@@ -71,11 +71,11 @@ export default function Home() {
         position: 'relative', zIndex: 1,
         maxWidth: 1240, margin: '0 auto',
         padding: '0 clamp(1.5rem, 4vw, 3.5rem)',
-        paddingTop: 'clamp(4rem, 8vw, 7rem)',
-        paddingBottom: 'clamp(4rem, 8vw, 7rem)',
+        paddingTop: 'clamp(2rem, 4vw, 3rem)',
+        paddingBottom: 'clamp(2rem, 4vw, 3rem)',
       }}>
         <div style={{ maxWidth: 780 }}>
-          <div className="eyebrow" style={{ marginBottom: '1rem', color: 'var(--amber)' }}>01 / HOME</div>
+          <div className="eyebrow" style={{ marginBottom: '1rem', color: 'var(--acid-lime)' }}>01 / HOME</div>
 		  <div className="eyebrow" style={{ marginBottom: '1.5rem' }}>
             Product Marketing Leader · Go-to-Market Strategist · Creative Problem-Solver
           </div>
@@ -90,7 +90,7 @@ export default function Home() {
           </h1>
 		  <div style={{
             height: 1,
-            background: 'linear-gradient(90deg, var(--amber), transparent)',
+            background: 'linear-gradient(90deg, var(--acid-lime), transparent)',
             width: 120, marginTop: '1.5rem',
           }} />
           <p style={{
@@ -100,13 +100,13 @@ export default function Home() {
             margin: '0 0 0.75rem',
           }}>
             Understand Value.
-            <span style={{ color: 'var(--amber)', marginLeft: '0.5rem' }}>
+            <span style={{ color: 'var(--acid-lime)', marginLeft: '0.5rem' }}>
               Deliver better positioning and messaging.
             </span>
           </p>
 
           <blockquote style={{
-            borderLeft: '2px solid var(--amber)',
+            borderLeft: '2px solid var(--acid-lime)',
             paddingLeft: '1.25rem', margin: '2rem 0 2.5rem',
             fontStyle: 'italic', color: 'var(--text-dim)', fontSize: '0.95rem',
           }}>
@@ -157,12 +157,12 @@ export default function Home() {
               fontFamily: 'Josefin Sans', textTransform: 'uppercase',
               letterSpacing: '0.22em', fontSize: '0.78rem', fontWeight: 500,
               padding: '0.95rem 1.6rem',
-              border: '1px solid var(--amber)', color: 'var(--amber)',
+              border: '1px solid var(--acid-lime)', color: 'var(--acid-lime)',
               textDecoration: 'none',
               transition: 'all 200ms ease',
             }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'var(--amber)'; e.currentTarget.style.color = 'var(--bg)' }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--amber)' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'var(--acid-lime)'; e.currentTarget.style.color = 'var(--bg)' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--acid-lime)' }}
             >
               See the work →
             </a>
@@ -171,7 +171,7 @@ export default function Home() {
 
         {/* Proof card */}
         <div style={{
-          marginTop: 'clamp(4rem, 8vw, 6rem)',
+          marginTop: 'clamp(2rem, 4vw, 3rem)',
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
           gap: '2rem',
@@ -188,7 +188,7 @@ export default function Home() {
               <div style={{
                 fontFamily: 'Josefin Sans', fontWeight: 200,
                 fontSize: 'clamp(2rem, 4vw, 3rem)',
-                color: 'var(--amber)', letterSpacing: '-0.01em',
+                color: 'var(--acid-lime)', letterSpacing: '-0.01em',
                 lineHeight: 1,
               }}>{value}</div>
               <div style={{
@@ -201,7 +201,7 @@ export default function Home() {
 
         {/* Operating ground */}
         <div style={{
-          marginTop: 'clamp(4rem, 6vw, 5rem)',
+          marginTop: 'clamp(2rem, 4vw, 3rem)',
           display: 'grid', gridTemplateColumns: '1fr 1fr',
           gap: '3rem',
           borderTop: '1px solid rgba(75,101,132,0.25)',
@@ -240,7 +240,7 @@ export default function Home() {
       {/* Footer */}
       <footer style={{
         borderTop: '1px solid rgba(75,101,132,0.18)',
-        padding: '2.5rem 0', marginTop: '4rem',
+        padding: '2.5rem 0', marginTop: '2rem',
         position: 'relative', zIndex: 1,
       }}>
         <div style={{
@@ -267,7 +267,7 @@ export default function Home() {
                 color: 'var(--text-dim)', textDecoration: 'none',
                 transition: 'color 160ms ease',
               }}
-                onMouseEnter={e => e.currentTarget.style.color = 'var(--amber)'}
+                onMouseEnter={e => e.currentTarget.style.color = 'var(--acid-lime)'}
                 onMouseLeave={e => e.currentTarget.style.color = 'var(--text-dim)'}
               >{label}</a>
             ))}

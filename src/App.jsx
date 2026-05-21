@@ -7,6 +7,7 @@ import Home from './screens/site/Home.jsx'
 import About from './screens/site/About.jsx'
 import Art from './screens/site/Art'
 import AppGateway from './screens/site/AppGateway.jsx'
+import HeroPitch from './screens/site/HeroPitch.jsx'
 
 // App screens
 import Login from './screens/app/Login.jsx'
@@ -46,6 +47,7 @@ export default function App() {
       <Route path="/about" element={<About />} />
 	  <Route path="/art" element={<Art />} />
       <Route path="/app" element={<AppGateway />} />
+      <Route path="/heropitch" element={<HeroPitch />} />
 
       {/* Auth */}
       <Route path="/login" element={<Login />} />

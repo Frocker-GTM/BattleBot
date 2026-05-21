@@ -32,7 +32,7 @@ export default function About() {
           justifyContent: 'space-between', height: 76,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-            <div style={{ width: 8, height: 8, background: 'var(--amber)', transform: 'rotate(45deg)' }} />
+            <div style={{ width: 8, height: 8, background: 'var(--acid-lime)', transform: 'rotate(45deg)' }} />
             <span style={{
               fontFamily: 'Josefin Sans', textTransform: 'uppercase',
               letterSpacing: '0.22em', fontSize: '0.82rem', fontWeight: 500,
@@ -52,7 +52,7 @@ export default function About() {
                 letterSpacing: '0.22em', fontSize: '0.78rem', fontWeight: 400,
                 color: active ? 'var(--text)' : 'var(--text-dim)',
                 textDecoration: 'none', padding: '0.4rem 0',
-                borderBottom: active ? '1px solid var(--amber)' : '1px solid transparent',
+                borderBottom: active ? '1px solid var(--acid-lime)' : '1px solid transparent',
               }}>{label}</a>
             ))}
           </nav>
@@ -63,13 +63,13 @@ export default function About() {
         position: 'relative', zIndex: 1,
         maxWidth: 1240, margin: '0 auto',
         padding: '0 clamp(1.5rem, 4vw, 3.5rem)',
-        paddingTop: 'clamp(4rem, 8vw, 7rem)',
-        paddingBottom: 'clamp(4rem, 8vw, 7rem)',
+        paddingTop: 'clamp(2rem, 4vw, 3rem)',
+        paddingBottom: 'clamp(2rem, 4vw, 3rem)',
       }}>
 
         {/* Page header */}
-        <div style={{ marginBottom: '4rem' }}>
-          <div className="eyebrow" style={{ marginBottom: '1rem', color: 'var(--amber)' }}>02 / ABOUT</div>
+        <div style={{ marginBottom: '2rem' }}>
+          <div className="eyebrow" style={{ marginBottom: '1rem', color: 'var(--acid-lime)' }}>02 / ABOUT</div>
           <h1 style={{
             fontFamily: 'Josefin Sans', fontWeight: 300,
             fontSize: 'clamp(2.25rem, 4vw, 3.5rem)',
@@ -80,7 +80,7 @@ export default function About() {
           </h1>
           <div style={{
             height: 1,
-            background: 'linear-gradient(90deg, var(--amber), transparent)',
+            background: 'linear-gradient(90deg, var(--acid-lime), transparent)',
             width: 120, marginTop: '1.5rem',
           }} />
         </div>
@@ -88,9 +88,9 @@ export default function About() {
         {/* Summary */}
         <div style={{
           display: 'grid', gridTemplateColumns: '1fr 2fr',
-          gap: '4rem', marginBottom: '5rem',
+          gap: '4rem', marginBottom: '3rem',
           borderBottom: '1px solid rgba(75,101,132,0.25)',
-          paddingBottom: '4rem',
+          paddingBottom: '2.5rem',
         }}>
           <div>
             <div className="eyebrow" style={{ marginBottom: '0.75rem' }}>Summary</div>
@@ -128,8 +128,50 @@ export default function About() {
           </div>
         </div>
 
+        {/* Examples of Work */}
+        <div style={{
+          display: 'grid', gridTemplateColumns: '1fr 2fr',
+          gap: '4rem', marginBottom: '3rem',
+          borderBottom: '1px solid rgba(75,101,132,0.25)',
+          paddingBottom: '2.5rem',
+        }}>
+          <div>
+            <div className="eyebrow" style={{ marginBottom: '0.75rem' }}>Examples of Work</div>
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-dim)', lineHeight: 1.6 }}>
+              The work, in practice.
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            {[
+              { n: '01', label: 'Samples Folder', value: 'Google Drive', href: 'https://drive.google.com/drive/folders/1hNOoRyl7ugK3EZ-01qVwAmwq1LNQpfYB?usp=drive_link' },
+              { n: '02', label: 'Storytelling',   value: 'Hero Pitch',   href: '/heropitch' },
+            ].map(({ n, label, value, href }) => (
+              <a key={n} href={href} target="_blank" rel="noreferrer" style={{
+                display: 'flex', alignItems: 'center', gap: '1.5rem',
+                padding: '1.1rem 1.25rem',
+                border: '1px solid rgba(75,101,132,0.25)',
+                textDecoration: 'none', color: 'var(--text)',
+                transition: 'border-color 160ms ease',
+              }}
+                onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--acid-lime)'}
+                onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(75,101,132,0.25)'}
+              >
+                <span style={{ fontFamily: 'JetBrains Mono', fontSize: '0.72rem', color: 'var(--text-dim)' }}>
+                  {n}
+                </span>
+                <span style={{
+                  fontFamily: 'Josefin Sans', textTransform: 'uppercase',
+                  letterSpacing: '0.18em', fontSize: '0.78rem', fontWeight: 500,
+                  color: 'var(--text-dim)', minWidth: 80,
+                }}>{label}</span>
+                <span style={{ fontSize: '0.9rem', color: 'var(--sapphire-sky)' }}>{value} →</span>
+              </a>
+            ))}
+          </div>
+        </div>
+
         {/* Career highlights */}
-        <div style={{ marginBottom: '5rem', borderBottom: '1px solid rgba(75,101,132,0.25)', paddingBottom: '4rem' }}>
+        <div style={{ marginBottom: '3rem', borderBottom: '1px solid rgba(75,101,132,0.25)', paddingBottom: '4rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '4rem' }}>
             <div>
               <div className="eyebrow" style={{ marginBottom: '0.75rem' }}>Career highlights</div>
@@ -255,7 +297,7 @@ export default function About() {
               </div>
               <div style={{
                 marginTop: '1.5rem', fontFamily: 'Josefin Sans',
-                fontWeight: 300, fontSize: '1.1rem', color: 'var(--amber)',
+                fontWeight: 300, fontSize: '1.1rem', color: 'var(--acid-lime)',
                 letterSpacing: '0.04em', lineHeight: 1.3,
               }}>
                 Better questions produce better answers.
@@ -275,7 +317,7 @@ export default function About() {
                 to be quieter, more accurate, and harder to copy.
               </p>
               <blockquote style={{
-                borderLeft: '2px solid var(--amber)', paddingLeft: '1.25rem',
+                borderLeft: '2px solid var(--acid-lime)', paddingLeft: '1.25rem',
                 fontStyle: 'italic', color: 'var(--text)', fontSize: '1rem',
               }}>
                 "Better planning, Better results."
@@ -363,7 +405,7 @@ export default function About() {
                   textDecoration: 'none', color: 'var(--text)',
                   transition: 'border-color 160ms ease',
                 }}
-                  onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--amber)'}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--acid-lime)'}
                   onMouseLeave={e => e.currentTarget.style.borderColor = 'rgba(75,101,132,0.25)'}
                 >
                   <span style={{ fontFamily: 'JetBrains Mono', fontSize: '0.72rem', color: 'var(--text-dim)' }}>
@@ -386,7 +428,7 @@ export default function About() {
       {/* Footer */}
       <footer style={{
         borderTop: '1px solid rgba(75,101,132,0.18)',
-        padding: '2.5rem 0', marginTop: '4rem',
+        padding: '2.5rem 0', marginTop: '2rem',
         position: 'relative', zIndex: 1,
       }}>
         <div style={{
@@ -412,7 +454,7 @@ export default function About() {
                 letterSpacing: '0.22em', fontSize: '0.74rem',
                 color: 'var(--text-dim)', textDecoration: 'none',
               }}
-                onMouseEnter={e => e.currentTarget.style.color = 'var(--amber)'}
+                onMouseEnter={e => e.currentTarget.style.color = 'var(--acid-lime)'}
                 onMouseLeave={e => e.currentTarget.style.color = 'var(--text-dim)'}
               >{label}</a>
             ))}

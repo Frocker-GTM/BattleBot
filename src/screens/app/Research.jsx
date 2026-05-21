@@ -274,13 +274,13 @@ export default function Research() {
 
       {/* Header */}
       <div style={{ padding: '32px 44px 24px', borderBottom: '1px solid var(--divider)' }}>
-        <div className="eyebrow" style={{ color: 'var(--amber)', marginBottom: 10 }}>— Live research</div>
+        <div className="eyebrow" style={{ color: 'var(--acid-lime)', marginBottom: 10 }}>— Live research</div>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
           <div>
             <h1 className="h-display" style={{ margin: 0, fontSize: 32, fontWeight: 300 }}>
               {product?.product_name || '…'}
               <span style={{ color: 'var(--text-dim)', margin: '0 16px' }}>vs.</span>
-              <span style={{ color: 'var(--amber-gold)' }}>
+              <span style={{ color: 'var(--acid-lime)' }}>
                 {competitor ? competitor.company_name : 'select a competitor'}
               </span>
             </h1>
@@ -379,7 +379,7 @@ export default function Research() {
                   padding: '18px', background: 'var(--bg)',
                   border: '1px solid var(--border)',
                 }}>
-                  <div className="eyebrow" style={{ marginBottom: 14, color: 'var(--amber)' }}>
+                  <div className="eyebrow" style={{ marginBottom: 14, color: 'var(--acid-lime)' }}>
                     New competitor profile
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
@@ -488,7 +488,7 @@ export default function Research() {
                     }}>
                       <div className="eyebrow" style={{
                         fontSize: 9.5, marginBottom: 6,
-                        color: msg.role === 'user' ? 'var(--sapphire-sky)' : 'var(--amber)',
+                        color: msg.role === 'user' ? 'var(--sapphire-sky)' : 'var(--acid-lime)',
                       }}>
                         {msg.role === 'user' ? '— You' : '— BattleBot'}
                       </div>
@@ -500,7 +500,7 @@ export default function Research() {
                   display: 'flex', gap: 10, marginTop: 10, alignItems: 'center',
                   background: 'var(--bg-input)', border: '1px solid var(--border)', padding: '10px 12px',
                 }}>
-                  <span style={{ color: 'var(--amber)', fontFamily: 'JetBrains Mono', fontSize: 12 }}>›</span>
+                  <span style={{ color: 'var(--acid-lime)', fontFamily: 'JetBrains Mono', fontSize: 12 }}>›</span>
                   <input className="bb-input"
                     style={{ background: 'transparent', border: 'none', padding: 0, fontSize: 13 }}
                     placeholder="Reply to confirm scope…"
@@ -598,7 +598,7 @@ export default function Research() {
               marginBottom: 24,
             }}>
               <div>
-                <div className="eyebrow" style={{ color: 'var(--amber)', marginBottom: 6 }}>Next</div>
+                <div className="eyebrow" style={{ color: 'var(--acid-lime)', marginBottom: 6 }}>Next</div>
                 <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>
                   {anyComplete
                     ? 'Research available. Proceed to FUD analysis or add analyst reports.'
@@ -610,7 +610,7 @@ export default function Research() {
                   onClick={() => navigate(`/analyst/${productId}/${competitor.id}`)}>
                   Analyst reports
                 </button>
-                <button className="bb-btn-amber"
+                <button className="bb-btn-acid-lime"
                   disabled={!anyComplete}
                   style={{ opacity: anyComplete ? 1 : 0.4 }}
                   onClick={() => navigate(`/fud/${productId}/${competitor.id}`)}>

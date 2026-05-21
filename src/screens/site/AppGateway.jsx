@@ -59,7 +59,7 @@ export default function AppGateway() {
           justifyContent: 'space-between', height: 76,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-            <div style={{ width: 8, height: 8, background: 'var(--amber)', transform: 'rotate(45deg)' }} />
+            <div style={{ width: 8, height: 8, background: 'var(--acid-lime)', transform: 'rotate(45deg)' }} />
             <span style={{
               fontFamily: 'Josefin Sans', textTransform: 'uppercase',
               letterSpacing: '0.22em', fontSize: '0.82rem', fontWeight: 500,
@@ -82,7 +82,7 @@ export default function AppGateway() {
                 letterSpacing: '0.22em', fontSize: '0.78rem', fontWeight: 400,
                 color: active ? 'var(--text)' : 'var(--text-dim)',
                 textDecoration: 'none', padding: '0.4rem 0',
-                borderBottom: active ? '1px solid var(--amber)' : '1px solid transparent',
+                borderBottom: active ? '1px solid var(--acid-lime)' : '1px solid transparent',
               }}>{label}</a>
             ))}
           </nav>
@@ -93,13 +93,13 @@ export default function AppGateway() {
         position: 'relative', zIndex: 1,
         maxWidth: 1240, margin: '0 auto',
         padding: '0 clamp(1.5rem, 4vw, 3.5rem)',
-        paddingTop: 'clamp(4rem, 8vw, 7rem)',
-        paddingBottom: 'clamp(4rem, 8vw, 7rem)',
+        paddingTop: 'clamp(2rem, 4vw, 3rem)',
+        paddingBottom: 'clamp(2rem, 4vw, 3rem)',
       }}>
 
         {/* Page header */}
-        <div style={{ marginBottom: '4rem' }}>
-          <div className="eyebrow" style={{ marginBottom: '1rem', color: 'var(--amber)' }}>04 / APP</div>
+        <div style={{ marginBottom: '2rem' }}>
+          <div className="eyebrow" style={{ marginBottom: '1rem', color: 'var(--acid-lime)' }}>04 / APP</div>
           <h1 style={{
             fontFamily: 'Josefin Sans', fontWeight: 300,
             fontSize: 'clamp(2.25rem, 4vw, 3.5rem)',
@@ -125,7 +125,7 @@ export default function AppGateway() {
         </div>
 
         {/* App cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '4rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
 
           {/* BattleBot card */}
           <div style={{
@@ -140,7 +140,7 @@ export default function AppGateway() {
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
               <div>
-                <div className="eyebrow" style={{ color: 'var(--amber)', marginBottom: '0.5rem' }}>
+                <div className="eyebrow" style={{ color: 'var(--acid-lime)', marginBottom: '0.5rem' }}>
                   AI APP / 001 · Competitive Intelligence
                 </div>
                 <h2 style={{
@@ -188,12 +188,12 @@ export default function AppGateway() {
                 fontFamily: 'Josefin Sans', textTransform: 'uppercase',
                 letterSpacing: '0.22em', fontSize: '0.78rem', fontWeight: 500,
                 padding: '0.95rem 1.6rem',
-                border: '1px solid var(--amber)', color: 'var(--amber)',
+                border: '1px solid var(--acid-lime)', color: 'var(--acid-lime)',
                 background: 'transparent', cursor: 'pointer',
                 transition: 'all 200ms ease',
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'var(--amber)'; e.currentTarget.style.color = 'var(--bg)' }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--amber)' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'var(--acid-lime)'; e.currentTarget.style.color = 'var(--bg)' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--acid-lime)' }}
             >
               Launch →
             </button>
@@ -266,7 +266,7 @@ export default function AppGateway() {
             {['tl','tr','bl','br'].map(p => (
               <div key={p} style={{
                 position: 'absolute', width: 10, height: 10,
-                borderColor: 'var(--amber)', borderStyle: 'solid', borderWidth: 0,
+                borderColor: 'var(--acid-lime)', borderStyle: 'solid', borderWidth: 0,
                 ...(p.includes('t') ? { top: -1, borderTopWidth: 1 } : { bottom: -1, borderBottomWidth: 1 }),
                 ...(p.includes('l') ? { left: -1, borderLeftWidth: 1 } : { right: -1, borderRightWidth: 1 }),
               }} />
@@ -278,12 +278,12 @@ export default function AppGateway() {
               fontSize: 18, cursor: 'pointer', lineHeight: 1,
             }}>✕</button>
 
-            <div className="eyebrow" style={{ color: 'var(--amber)', marginBottom: 10 }}>
+            <div className="eyebrow" style={{ color: 'var(--acid-lime)', marginBottom: 10 }}>
               BattleBot · {authMode === 'login' ? 'Sign in' : 'Create account'}
             </div>
             <h2 className="h-display" style={{ fontSize: 28, margin: '0 0 8px', fontWeight: 300 }}>
               {authMode === 'login' ? 'Welcome back,' : 'Get started,'}
-              <br /><span style={{ color: 'var(--amber)' }}>operator.</span>
+              <br /><span style={{ color: 'var(--acid-lime)' }}>operator.</span>
             </h2>
             <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 24, lineHeight: 1.55 }}>
               Authentication is handled by Supabase. Your session is scoped to this platform only.
@@ -350,7 +350,7 @@ export default function AppGateway() {
                 letterSpacing: '0.22em', fontSize: '0.74rem',
                 color: 'var(--text-dim)', textDecoration: 'none',
               }}
-                onMouseEnter={e => e.currentTarget.style.color = 'var(--amber)'}
+                onMouseEnter={e => e.currentTarget.style.color = 'var(--acid-lime)'}
                 onMouseLeave={e => e.currentTarget.style.color = 'var(--text-dim)'}
               >{label}</a>
             ))}

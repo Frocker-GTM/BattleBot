@@ -30,17 +30,17 @@
   --amethyst-lavender: #B794FA;
   --amethyst-void: #1A0F33;
 
-  --amber: #E8A020;
-  --amber-burnt: #A35A0A;
-  --amber-gold: #F2C46D;
-  --amber-ember: #3D1F00;
+  --acid-lime: #A3E635;
+  --acid-lime-forest: #3D6B00;
+  --acid-lime-chartreuse: #CEFF6B;
+  --acid-lime-shadow: #1A2E00;
 
-  --slate: #4B6584;
+  --slate: #97BFE5;
 
   /* Status */
   --status-running: #2D7DD2;
   --status-complete: #4ADE80;
-  --status-needs: #E8A020;
+  --status-needs: #A3E635;
   --status-error: #EF4444;
 }
 
@@ -133,9 +133,9 @@ html, body {
 }
 .bb-btn-primary:hover { background: var(--sapphire-sky); }
 
-.bb-btn-amber {
-  background: var(--amber);
-  color: #14110A;
+.bb-btn-acid-lime {
+  background: var(--acid-lime);
+  color: #0D1A00;
   border: none;
   padding: 12px 22px;
   border-radius: 3px;

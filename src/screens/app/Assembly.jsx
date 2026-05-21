@@ -207,14 +207,14 @@ export default function Assembly() {
       <TopNav active="Dashboard" breadcrumb={
         <><span>{product?.product_name || '…'}</span>
         <span style={{ color: 'var(--text-dim)' }}>·</span>
-        <span style={{ color: 'var(--amber-gold)' }}>vs {competitorName}</span>
+        <span style={{ color: 'var(--acid-lime)' }}>vs {competitorName}</span>
         <span style={{ color: 'var(--text-dim)' }}>·</span>
         <span>Assembly</span></>
       } />
 
       {/* Header */}
       <div style={{ padding: '28px 44px 22px', borderBottom: '1px solid var(--divider)' }}>
-        <div className="eyebrow" style={{ color: 'var(--amber)', marginBottom: 8 }}>— Assembly</div>
+        <div className="eyebrow" style={{ color: 'var(--acid-lime)', marginBottom: 8 }}>— Assembly</div>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
           <h1 className="h-display" style={{ margin: 0, fontSize: 30, fontWeight: 300 }}>
             Three confirmations from a battlecard
@@ -296,7 +296,7 @@ export default function Assembly() {
                       </select>
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                      <HarveyBall value={uc.uc_their_score ?? uc.competitor_score ?? 0} size={20} color="#F2C46D" />
+                      <HarveyBall value={uc.uc_their_score ?? uc.competitor_score ?? 0} size={20} color="var(--acid-lime)" />
                     </div>
                     <span style={{ fontSize: 12.5, color: 'var(--text-muted)' }}>{uc.uc_rationale || uc.rationale}</span>
                   </div>
@@ -341,7 +341,7 @@ export default function Assembly() {
                   { key: 'strengths',     label: 'Strengths',     color: '#86EFAC', bg: 'rgba(74,222,128,0.04)' },
                   { key: 'weaknesses',    label: 'Weaknesses',    color: '#FCA5A5', bg: 'rgba(239,68,68,0.04)' },
                   { key: 'opportunities', label: 'Opportunities', color: '#5FA8E8', bg: 'rgba(45,125,210,0.04)' },
-                  { key: 'threats',       label: 'Threats',       color: '#F2C46D', bg: 'rgba(232,160,32,0.04)' },
+                  { key: 'threats',       label: 'Threats',       color: 'var(--acid-lime)', bg: 'rgba(163,230,53,0.04)' },
                 ].map(({ key, label, color, bg }) => (
                   <div key={key} style={{ background: bg, border: `1px solid ${color}33`, padding: '16px 18px' }}>
                     <div className="eyebrow" style={{ color, marginBottom: 10 }}>{label}</div>
@@ -355,7 +355,7 @@ export default function Assembly() {
                   </div>
                 ))}
               </div>
-              <button className="bb-btn-amber" onClick={() => setSwotConfirmed(true)}>
+              <button className="bb-btn-acid-lime" onClick={() => setSwotConfirmed(true)}>
                 Confirm SWOT →
               </button>
             </>

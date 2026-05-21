@@ -67,7 +67,7 @@ export default function Signup() {
         {['tl','tr','bl','br'].map(p => (
           <div key={p} style={{
             position: 'absolute', width: 10, height: 10,
-            borderColor: 'var(--amber)', borderStyle: 'solid', borderWidth: 0,
+            borderColor: 'var(--acid-lime)', borderStyle: 'solid', borderWidth: 0,
             ...(p.includes('t') ? { top: -1, borderTopWidth: 1 } : { bottom: -1, borderBottomWidth: 1 }),
             ...(p.includes('l') ? { left: -1, borderLeftWidth: 1 } : { right: -1, borderRightWidth: 1 }),
           }} />
@@ -77,7 +77,7 @@ export default function Signup() {
           <div style={{ textAlign: 'center' }}>
             <div className="eyebrow" style={{ color: 'var(--status-complete)', marginBottom: 14 }}>— Account created</div>
             <h1 className="h-display" style={{ fontSize: 32, margin: '0 0 18px', fontWeight: 300 }}>
-              Check your<br/><span style={{ color: 'var(--amber)' }}>email.</span>
+              Check your<br/><span style={{ color: 'var(--acid-lime)' }}>email.</span>
             </h1>
             <p style={{ color: 'var(--text-muted)', fontSize: 14, lineHeight: 1.55 }}>
               We sent a confirmation link to <span style={{ color: 'var(--text)' }}>{email}</span>. Click it to activate your account, then sign in.
@@ -93,9 +93,9 @@ export default function Signup() {
         ) : (
           <>
             <div style={{ marginBottom: 36 }}>
-              <div className="eyebrow" style={{ marginBottom: 14, color: 'var(--amber)' }}>— Create account</div>
+              <div className="eyebrow" style={{ marginBottom: 14, color: 'var(--acid-lime)' }}>— Create account</div>
               <h1 className="h-display" style={{ fontSize: 38, margin: 0, fontWeight: 300, lineHeight: 1.05 }}>
-                Start arriving<br/><span style={{ color: 'var(--amber)' }}>prepared.</span>
+                Start arriving<br/><span style={{ color: 'var(--acid-lime)' }}>prepared.</span>
               </h1>
               <p style={{ color: 'var(--text-muted)', marginTop: 18, fontSize: 14, lineHeight: 1.55 }}>
                 Build your first product profile in under three minutes.

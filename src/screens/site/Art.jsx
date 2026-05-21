@@ -59,7 +59,7 @@ export default function Art() {
           justifyContent: 'space-between', height: 76,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-            <div style={{ width: 8, height: 8, background: 'var(--amber)', transform: 'rotate(45deg)' }} />
+            <div style={{ width: 8, height: 8, background: 'var(--acid-lime)', transform: 'rotate(45deg)' }} />
             <span style={{
               fontFamily: 'Josefin Sans', textTransform: 'uppercase',
               letterSpacing: '0.22em', fontSize: '0.82rem', fontWeight: 500,
@@ -79,7 +79,7 @@ export default function Art() {
                 letterSpacing: '0.22em', fontSize: '0.78rem', fontWeight: 400,
                 color: active ? 'var(--text)' : 'var(--text-dim)',
                 textDecoration: 'none', padding: '0.4rem 0',
-                borderBottom: active ? '1px solid var(--amber)' : '1px solid transparent',
+                borderBottom: active ? '1px solid var(--acid-lime)' : '1px solid transparent',
               }}>{label}</a>
             ))}
           </nav>
@@ -91,13 +91,13 @@ export default function Art() {
         position: 'relative', zIndex: 1,
         maxWidth: 1240, margin: '0 auto',
         padding: '0 clamp(1.5rem, 4vw, 3.5rem)',
-        paddingTop: 'clamp(4rem, 8vw, 7rem)',
-        paddingBottom: 'clamp(4rem, 8vw, 7rem)',
+        paddingTop: 'clamp(2rem, 4vw, 3rem)',
+        paddingBottom: 'clamp(2rem, 4vw, 3rem)',
       }}>
 
         {/* Page header */}
-        <div style={{ marginBottom: '4rem' }}>
-          <div className="eyebrow" style={{ marginBottom: '1rem', color: 'var(--amber)' }}>03 / ART</div>
+        <div style={{ marginBottom: '2rem' }}>
+          <div className="eyebrow" style={{ marginBottom: '1rem', color: 'var(--acid-lime)' }}>03 / ART</div>
           <h1 style={{
             fontFamily: 'Josefin Sans', fontWeight: 300,
             fontSize: 'clamp(2.25rem, 4vw, 3.5rem)',
@@ -108,7 +108,7 @@ export default function Art() {
           </h1>
           <div style={{
             height: 1,
-            background: 'linear-gradient(90deg, var(--amber), transparent)',
+            background: 'linear-gradient(90deg, var(--acid-lime), transparent)',
             width: 120, marginTop: '1.5rem',
           }} />
           <p style={{
@@ -136,7 +136,7 @@ export default function Art() {
                 overflow: 'hidden',
                 transition: 'border-color 200ms ease',
               }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--amber)'}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--acid-lime)'}
               onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
             >
               {/* Thumbnail */}
@@ -172,7 +172,7 @@ export default function Art() {
       {/* Footer */}
       <footer style={{
         borderTop: '1px solid rgba(75,101,132,0.18)',
-        padding: '2.5rem 0', marginTop: '4rem',
+        padding: '2.5rem 0', marginTop: '2rem',
         position: 'relative', zIndex: 1,
       }}>
         <div style={{
@@ -199,7 +199,7 @@ export default function Art() {
                 color: 'var(--text-dim)', textDecoration: 'none',
                 transition: 'color 160ms ease',
               }}
-                onMouseEnter={e => e.currentTarget.style.color = 'var(--amber)'}
+                onMouseEnter={e => e.currentTarget.style.color = 'var(--acid-lime)'}
                 onMouseLeave={e => e.currentTarget.style.color = 'var(--text-dim)'}
               >{label}</a>
             ))}
@@ -262,7 +262,7 @@ export default function Art() {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               transition: 'border-color 160ms ease, color 160ms ease',
             }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--amber)'; e.currentTarget.style.color = 'var(--amber)' }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--acid-lime)'; e.currentTarget.style.color = 'var(--acid-lime)' }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(75,101,132,0.35)'; e.currentTarget.style.color = 'var(--text-dim)' }}
           >←</button>
 
@@ -299,7 +299,7 @@ export default function Art() {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               transition: 'border-color 160ms ease, color 160ms ease',
             }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--amber)'; e.currentTarget.style.color = 'var(--amber)' }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--acid-lime)'; e.currentTarget.style.color = 'var(--acid-lime)' }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(75,101,132,0.35)'; e.currentTarget.style.color = 'var(--text-dim)' }}
           >→</button>
         </div>

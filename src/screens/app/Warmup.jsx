@@ -144,7 +144,7 @@ export default function Warmup() {
               — Profile saved
             </div>
             <h1 className="h-display" style={{ fontSize: 32, margin: '0 0 18px', fontWeight: 300 }}>
-              <span style={{ color: 'var(--amber)' }}>{savedProductName}</span> is ready.
+              <span style={{ color: 'var(--acid-lime)' }}>{savedProductName}</span> is ready.
             </h1>
             <p style={{ color: 'var(--text-muted)', fontSize: 14, lineHeight: 1.6 }}>
               Your product profile has been saved. You can now run web research and build your first battlecard.
@@ -153,7 +153,7 @@ export default function Warmup() {
               <button className="bb-btn-ghost" onClick={() => navigate('/dashboard')}>
                 Dashboard
               </button>
-              <button className="bb-btn-amber" onClick={() => navigate(`/research/${savedProductId}`)}>
+              <button className="bb-btn-acid-lime" onClick={() => navigate(`/research/${savedProductId}`)}>
                 Go to research →
               </button>
             </div>
@@ -166,7 +166,7 @@ export default function Warmup() {
 
           {/* Stepper */}
           <div style={{ borderRight: '1px solid var(--divider)', padding: '32px 28px', overflow: 'auto' }}>
-            <div className="eyebrow" style={{ color: 'var(--amber)', marginBottom: 14 }}>— Warmup</div>
+            <div className="eyebrow" style={{ color: 'var(--acid-lime)', marginBottom: 14 }}>— Warmup</div>
             <h2 className="h-display" style={{ fontSize: 24, margin: 0, fontWeight: 300 }}>
               Define the<br/>product profile.
             </h2>
@@ -178,8 +178,8 @@ export default function Warmup() {
                 <div key={s.n} style={{
                   display: 'flex', alignItems: 'center', gap: 14,
                   padding: '12px 14px',
-                  background: i === 0 ? 'rgba(232,160,32,0.06)' : 'transparent',
-                  borderLeft: `2px solid ${i === 0 ? 'var(--amber)' : 'var(--border)'}`,
+                  background: i === 0 ? 'rgba(163,230,53,0.06)' : 'transparent',
+                  borderLeft: `2px solid ${i === 0 ? 'var(--acid-lime)' : 'var(--border)'}`,
                 }}>
                   <span style={{ fontFamily: 'JetBrains Mono', fontSize: 11, color: 'var(--text-dim)' }}>{s.n}</span>
                   <span style={{
@@ -194,7 +194,7 @@ export default function Warmup() {
 
           {/* Form */}
           <div style={{ overflow: 'auto', padding: '36px 44px' }}>
-            <div className="eyebrow" style={{ color: 'var(--amber)', marginBottom: 8 }}>— Step 01</div>
+            <div className="eyebrow" style={{ color: 'var(--acid-lime)', marginBottom: 8 }}>— Step 01</div>
             <h2 className="h-display" style={{ fontSize: 28, margin: '0 0 28px', fontWeight: 300 }}>
               Baseline information
             </h2>
@@ -244,7 +244,7 @@ export default function Warmup() {
               )}
 
               <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: 8 }}>
-                <button className="bb-btn-amber" type="submit" disabled={loading}
+                <button className="bb-btn-acid-lime" type="submit" disabled={loading}
                   style={{ padding: '14px 28px', opacity: loading ? 0.6 : 1 }}>
                   {loading ? 'Starting…' : 'Begin warmup →'}
                 </button>
@@ -272,8 +272,8 @@ export default function Warmup() {
                   <div key={s.n} style={{
                     display: 'flex', alignItems: 'center', gap: 14,
                     padding: '12px 14px',
-                    background: active ? 'rgba(232,160,32,0.06)' : 'transparent',
-                    borderLeft: `2px solid ${active ? 'var(--amber)' : done ? 'var(--sapphire)' : 'var(--border)'}`,
+                    background: active ? 'rgba(163,230,53,0.06)' : 'transparent',
+                    borderLeft: `2px solid ${active ? 'var(--acid-lime)' : done ? 'var(--sapphire)' : 'var(--border)'}`,
                   }}>
                     <span style={{ fontFamily: 'JetBrains Mono', fontSize: 11, color: 'var(--text-dim)' }}>{s.n}</span>
                     <span style={{
@@ -338,7 +338,7 @@ export default function Warmup() {
                     padding: '14px 18px',
                   }}>
                     <div className="eyebrow" style={{
-                      color: msg.role === 'user' ? 'var(--sapphire-sky)' : 'var(--amber)',
+                      color: msg.role === 'user' ? 'var(--sapphire-sky)' : 'var(--acid-lime)',
                       marginBottom: 8, fontSize: 10,
                     }}>
                       {msg.role === 'user' ? '— You' : '— BattleBot'}
@@ -352,7 +352,7 @@ export default function Warmup() {
                         marginTop: 14, paddingTop: 14, borderTop: '1px solid var(--divider)',
                         display: 'flex', gap: 10, alignItems: 'center',
                       }}>
-                        <button className="bb-btn-amber" style={{ padding: '10px 18px' }}
+                        <button className="bb-btn-acid-lime" style={{ padding: '10px 18px' }}
                           onClick={handleConfirmAndSave} disabled={loading}>
                           {loading ? 'Saving…' : 'Confirm & save'}
                         </button>
@@ -370,7 +370,7 @@ export default function Warmup() {
                     background: 'var(--bg-raised)', border: '1px solid var(--border)',
                     padding: '14px 18px',
                   }}>
-                    <div className="eyebrow" style={{ color: 'var(--amber)', marginBottom: 8, fontSize: 10 }}>— BattleBot</div>
+                    <div className="eyebrow" style={{ color: 'var(--acid-lime)', marginBottom: 8, fontSize: 10 }}>— BattleBot</div>
                     <div style={{ fontSize: 14, color: 'var(--text-dim)', fontFamily: 'JetBrains Mono' }}>thinking…</div>
                   </div>
                 </div>
@@ -389,7 +389,7 @@ export default function Warmup() {
               <form onSubmit={handleSend} style={{ display: 'flex', alignItems: 'center', gap: 12,
                 background: 'var(--bg-input)', border: '1px solid var(--border)', padding: '12px 14px',
               }}>
-                <span style={{ color: 'var(--amber)', fontFamily: 'JetBrains Mono', fontSize: 12 }}>›</span>
+                <span style={{ color: 'var(--acid-lime)', fontFamily: 'JetBrains Mono', fontSize: 12 }}>›</span>
                 <input
                   className="bb-input"
                   style={{ background: 'transparent', border: 'none', padding: 0, fontSize: 14 }}

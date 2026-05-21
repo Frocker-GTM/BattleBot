@@ -50,13 +50,13 @@ export default function Dashboard() {
         padding: '36px 44px 28px', borderBottom: '1px solid var(--divider)',
       }}>
         <div>
-          <div className="eyebrow" style={{ color: 'var(--amber)', marginBottom: 10 }}>— Workspace</div>
+          <div className="eyebrow" style={{ color: 'var(--acid-lime)', marginBottom: 10 }}>— Workspace</div>
           <h1 className="h-display" style={{ margin: 0, fontSize: 36, fontWeight: 300 }}>Your Battlecards</h1>
           <p style={{ margin: '10px 0 0', color: 'var(--text-muted)', fontSize: 14 }}>
             {loading ? 'Loading…' : `${products.length} product${products.length !== 1 ? 's' : ''} · ${battlecards.length} battlecard${battlecards.length !== 1 ? 's' : ''}`}
           </p>
         </div>
-        <button className="bb-btn-amber" onClick={() => navigate('/warmup')}>＋ New product</button>
+        <button className="bb-btn-acid-lime" onClick={() => navigate('/warmup')}>＋ New product</button>
       </div>
 
       <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '340px 1fr', overflow: 'hidden' }}>
@@ -144,7 +144,7 @@ export default function Dashboard() {
                 <div style={{ fontFamily: 'Josefin Sans', fontSize: 15, fontWeight: 500, letterSpacing: '0.01em' }}>
                   {card.user_products?.product_name || card.product_name || '…'}
                 </div>
-                <div style={{ fontFamily: 'Josefin Sans', fontSize: 15, fontWeight: 500, color: 'var(--amber-gold)' }}>
+                <div style={{ fontFamily: 'Josefin Sans', fontSize: 15, fontWeight: 500, color: 'var(--acid-lime)' }}>
                   vs {card.competitor_profiles?.company_name || card.competitor_name || '…'}
                 </div>
                 <StatusBadge status={card.status} />

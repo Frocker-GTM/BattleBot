@@ -35,14 +35,14 @@ export default function Analyst() {
       <TopNav active="Dashboard" breadcrumb={
         <><span>{product.product_name}</span>
         <span style={{ color: 'var(--text-dim)' }}>·</span>
-        <span style={{ color: 'var(--amber-gold)' }}>vs {competitor.company_name}</span>
+        <span style={{ color: 'var(--acid-lime)' }}>vs {competitor.company_name}</span>
         <span style={{ color: 'var(--text-dim)' }}>·</span>
         <span>Analyst intake</span></>
       } />
 
       {/* Header */}
       <div style={{ padding: '28px 44px 0', borderBottom: '1px solid var(--divider)' }}>
-        <div className="eyebrow" style={{ color: 'var(--amber)', marginBottom: 8 }}>— Analyst intake</div>
+        <div className="eyebrow" style={{ color: 'var(--acid-lime)', marginBottom: 8 }}>— Analyst intake</div>
         <h1 className="h-display" style={{ margin: 0, fontSize: 30, fontWeight: 300 }}>
           Forrester &amp; Gartner extraction
         </h1>
@@ -59,7 +59,7 @@ export default function Analyst() {
           ].map(t => (
             <div key={t.id} onClick={() => setActiveTab(t.id)} style={{
               padding: '12px 22px', cursor: 'pointer',
-              borderBottom: activeTab === t.id ? '2px solid var(--amber)' : '2px solid transparent',
+              borderBottom: activeTab === t.id ? '2px solid var(--acid-lime)' : '2px solid transparent',
               color: activeTab === t.id ? 'var(--text)' : 'var(--text-muted)',
               fontFamily: 'Josefin Sans', fontWeight: 500,
               textTransform: 'uppercase', letterSpacing: '0.14em', fontSize: 12,
@@ -220,7 +220,7 @@ function ForresterFlow({ productId, competitor }) {
         </div>
         {error && <ErrorBox message={error} />}
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <button className="bb-btn-amber" type="submit" disabled={loading}
+          <button className="bb-btn-acid-lime" type="submit" disabled={loading}
             style={{ padding: '12px 28px', opacity: loading ? 0.6 : 1 }}>
             {loading ? 'Starting…' : 'Start extraction →'}
           </button>
@@ -427,7 +427,7 @@ function ExtractionLayout({
         </div>
         {stepMeta && (
           <div style={{ padding: '12px 14px', background: 'var(--bg-raised)', border: '1px solid var(--border)' }}>
-            <div className="eyebrow" style={{ marginBottom: 4, color: 'var(--amber)', fontSize: 9.5 }}>Current step</div>
+            <div className="eyebrow" style={{ marginBottom: 4, color: 'var(--acid-lime)', fontSize: 9.5 }}>Current step</div>
             <div style={{ fontFamily: 'Josefin Sans', fontSize: 15, fontWeight: 300 }}>
               {stepMeta.n} — {stepMeta.label}
             </div>
@@ -449,7 +449,7 @@ function ExtractionLayout({
             marginBottom: 24, padding: '20px 22px',
             background: 'var(--bg-raised)', border: '1px solid var(--border)',
           }}>
-            <div className="eyebrow" style={{ color: 'var(--amber)', marginBottom: 10 }}>— BattleBot</div>
+            <div className="eyebrow" style={{ color: 'var(--acid-lime)', marginBottom: 10 }}>— BattleBot</div>
             <div style={{ fontSize: 14, lineHeight: 1.75, color: 'var(--text)', whiteSpace: 'pre-wrap' }}>
               {agentMessage}
             </div>
@@ -494,8 +494,8 @@ function ExtractionLayout({
                   onClick={() => setConfidenceScore(String(n))}
                   style={{
                     width: 48, height: 48, cursor: 'pointer',
-                    background: confidenceScore === String(n) ? 'var(--amber)' : 'var(--bg-raised)',
-                    border: `1px solid ${confidenceScore === String(n) ? 'var(--amber)' : 'var(--border)'}`,
+                    background: confidenceScore === String(n) ? 'var(--acid-lime)' : 'var(--bg-raised)',
+                    border: `1px solid ${confidenceScore === String(n) ? 'var(--acid-lime)' : 'var(--border)'}`,
                     color: confidenceScore === String(n) ? 'var(--bg)' : 'var(--text)',
                     fontFamily: 'Josefin Sans', fontWeight: 600, fontSize: 18,
                   }}>{n}</button>

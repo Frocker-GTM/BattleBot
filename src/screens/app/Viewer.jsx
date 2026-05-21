@@ -73,7 +73,7 @@ export default function Viewer() {
       <TopNav active="Battlecards" breadcrumb={
         <><span style={{ color: 'var(--sapphire-sky)' }}>{productName}</span>
         <span style={{ color: 'var(--text-dim)' }}>·</span>
-        <span style={{ color: 'var(--amber-gold)' }}>vs {competitorName}</span></>
+        <span style={{ color: 'var(--acid-lime)' }}>vs {competitorName}</span></>
       } />
 
       {/* Header */}
@@ -83,13 +83,13 @@ export default function Viewer() {
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 22 }}>
           <div>
-            <div className="eyebrow" style={{ color: 'var(--amber)', marginBottom: 10 }}>
+            <div className="eyebrow" style={{ color: 'var(--acid-lime)', marginBottom: 10 }}>
               — Battlecard · v.{version.version_number}
             </div>
             <h1 className="h-display" style={{ margin: 0, fontSize: 38, fontWeight: 300 }}>
               <span style={{ color: 'var(--sapphire-sky)' }}>{productName}</span>
               <span style={{ color: 'var(--text-dim)', margin: '0 18px', fontWeight: 200 }}>vs.</span>
-              <span style={{ color: 'var(--amber-gold)' }}>{competitorName}</span>
+              <span style={{ color: 'var(--acid-lime)' }}>{competitorName}</span>
             </h1>
             <div style={{ marginTop: 12, display: 'flex', gap: 22, fontSize: 12.5, color: 'var(--text-muted)' }}>
               <span>
@@ -116,7 +116,7 @@ export default function Viewer() {
           {tabs.map((tab, i) => (
             <div key={i} onClick={() => setActiveTab(i)} style={{
               padding: '14px 26px', cursor: 'pointer',
-              borderBottom: activeTab === i ? '2px solid var(--amber)' : '2px solid transparent',
+              borderBottom: activeTab === i ? '2px solid var(--acid-lime)' : '2px solid transparent',
               color: activeTab === i ? 'var(--text)' : 'var(--text-muted)',
               fontFamily: 'Josefin Sans', textTransform: 'uppercase',
               letterSpacing: '0.16em', fontSize: 12, fontWeight: 500,
@@ -143,7 +143,7 @@ export default function Viewer() {
               }}>
                 <span>Use case</span>
                 <span style={{ textAlign: 'center', color: 'var(--sapphire-sky)' }}>{productName}</span>
-                <span style={{ textAlign: 'center', color: 'var(--amber-gold)' }}>{competitorName}</span>
+                <span style={{ textAlign: 'center', color: 'var(--acid-lime)' }}>{competitorName}</span>
                 <span>Rationale</span>
               </div>
               {useCases.map((uc, i) => (
@@ -168,7 +168,7 @@ export default function Viewer() {
                       <HarveyBall value={uc.uc_our_score || 0} size={22} color="#5FA8E8" />
                     </span>
                     <span style={{ textAlign: 'center' }}>
-                      <HarveyBall value={uc.uc_their_score || 0} size={22} color="#F2C46D" />
+                      <HarveyBall value={uc.uc_their_score || 0} size={22} color="var(--acid-lime)" />
                     </span>
                     <span style={{ fontSize: 12.5, color: 'var(--text-muted)', lineHeight: 1.55 }}>
                       {uc.uc_rationale}
@@ -311,7 +311,7 @@ export default function Viewer() {
                     <div>
                       <h5 style={{
                         fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.2em',
-                        color: 'var(--amber-gold)', margin: '0 0 6px',
+                        color: 'var(--acid-lime)', margin: '0 0 6px',
                         fontFamily: 'Josefin Sans', fontWeight: 600,
                       }}>Cautions cited</h5>
                       <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13 }}>
@@ -362,7 +362,7 @@ export default function Viewer() {
                     <div>
                       <h5 style={{
                         fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.2em',
-                        color: 'var(--amber-gold)', margin: '0 0 6px',
+                        color: 'var(--acid-lime)', margin: '0 0 6px',
                         fontFamily: 'Josefin Sans', fontWeight: 600,
                       }}>Complaint themes</h5>
                       <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13 }}>
@@ -398,7 +398,7 @@ export default function Viewer() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, background: 'var(--divider)' }}>
                   {[
                     { key: 'strengths',     label: 'Strengths',     color: 'var(--sapphire-sky)',      border: 'var(--sapphire)' },
-                    { key: 'weaknesses',    label: 'Weaknesses',    color: 'var(--amber-gold)',         border: 'var(--amber)' },
+                    { key: 'weaknesses',    label: 'Weaknesses',    color: 'var(--acid-lime)',           border: 'var(--acid-lime)' },
                     { key: 'opportunities', label: 'Opportunities', color: 'var(--amethyst-lavender)',  border: 'var(--amethyst)' },
                     { key: 'threats',       label: 'Threats',       color: '#B8D9F7',                   border: 'var(--slate)' },
                   ].map(({ key, label, color, border }) => (
@@ -447,7 +447,7 @@ export default function Viewer() {
                   display: 'flex', alignItems: 'center', gap: 14,
                   marginBottom: 14, paddingBottom: 10, borderBottom: '1px solid var(--divider)',
                 }}>
-                  <span style={{ fontFamily: 'JetBrains Mono', fontSize: 11, color: 'var(--amber)', letterSpacing: '0.1em' }}>
+                  <span style={{ fontFamily: 'JetBrains Mono', fontSize: 11, color: 'var(--acid-lime)', letterSpacing: '0.1em' }}>
                     {String(si + 1).padStart(2, '0')}
                   </span>
                   <h3 style={{
@@ -471,14 +471,14 @@ export default function Viewer() {
                       <div style={{
                         fontFamily: 'Josefin Sans', fontSize: 10, letterSpacing: '0.22em',
                         textTransform: 'uppercase', fontWeight: 600, marginBottom: 10,
-                        display: 'flex', alignItems: 'center', gap: 8, color: 'var(--amber)',
+                        display: 'flex', alignItems: 'center', gap: 8, color: 'var(--acid-lime)',
                       }}>
                         <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'currentColor' }} />
                         Intelligence
                         <span style={{
                           fontFamily: 'JetBrains Mono', fontSize: 9, padding: '2px 6px',
-                          background: item.priority === 'high' ? 'rgba(232,160,32,0.15)' : 'rgba(139,92,246,0.15)',
-                          color: item.priority === 'high' ? 'var(--amber-gold)' : 'var(--amethyst-lavender)',
+                          background: item.priority === 'high' ? 'rgba(163,230,53,0.15)' : 'rgba(139,92,246,0.15)',
+                          color: item.priority === 'high' ? 'var(--acid-lime)' : 'var(--amethyst-lavender)',
                           letterSpacing: '0.08em', textTransform: 'uppercase', marginLeft: 'auto',
                         }}>{item.priority_label}</span>
                       </div>
