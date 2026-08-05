@@ -117,4 +117,4 @@ New user signups are currently disabled while the product stabilizes.
 
 Built by **Bryan Finfrock**, a Product Marketing Manager and GTM strategist, as both a working competitive intelligence tool and a demonstration of hands-on technical execution. It's part of a broader personal site showcasing product marketing work alongside things actually built and shipped.
 
-- LinkedIn / contact: *add your links here*
+- LinkedIn / contact: https://www.linkedin.com/in/bryanfinfrock/
