@@ -202,26 +202,30 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Proof card */}
+        {/* Proof panel — 1px gap over a border-colored backdrop draws the dividers, even when tiles wrap */}
         <div style={{
-          marginTop: 'clamp(2rem, 4vw, 3rem)',
+          marginTop: 'clamp(2.5rem, 5vw, 3.5rem)',
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-          gap: '2rem',
-          borderTop: '1px solid rgba(75,101,132,0.25)',
-          paddingTop: '3rem',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: 1,
+          background: 'var(--border)',
+          border: '1px solid var(--border)',
         }}>
           {[
-            { value: '15+',               label: 'Years in B2B SaaS' },
             { value: '#1',                label: 'On Google for "Campaign Management"' },
             { value: 'Industry standard', label: 'Projected Open Rate. Braze followed.' },
             { value: '8× / 4×',           label: 'Analyst inquiry growth / briefing growth' },
+            { value: '15+',               label: 'Years in B2B SaaS' },
           ].map(({ value, label }) => (
-            <div key={label}>
+            <div key={label} style={{
+              background: 'var(--bg-raised)',
+              padding: 'clamp(1.5rem, 3vw, 2.25rem) clamp(1.25rem, 2.5vw, 1.75rem)',
+            }}>
               <div style={{
-                fontFamily: 'Josefin Sans', fontWeight: 200,
+                fontFamily: 'Josefin Sans', fontWeight: 300,
                 fontSize: value.length > 8 ? 'clamp(1.4rem, 2.4vw, 1.9rem)' : 'clamp(2rem, 4vw, 3rem)',
                 color: 'var(--acid-lime)', letterSpacing: '-0.01em',
+                textShadow: '0 0 18px rgba(163,230,53,0.35)',
                 lineHeight: 1, minHeight: 'clamp(2rem, 4vw, 3rem)',
                 display: 'flex', alignItems: 'flex-end',
               }}>{value}</div>
