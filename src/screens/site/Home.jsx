@@ -77,7 +77,7 @@ export default function Home() {
         <div style={{ maxWidth: 780 }}>
           <div className="eyebrow" style={{ marginBottom: '1rem', color: 'var(--acid-lime)' }}>01 / HOME</div>
 		  <div className="eyebrow" style={{ marginBottom: '1.5rem' }}>
-            Product Marketing Leader · Go-to-Market Strategist · Creative Problem-Solver
+            The Epiphany PMM · I Deliver Ah-Ha Moments
           </div>
 
           <h1 style={{
@@ -99,9 +99,9 @@ export default function Home() {
             color: 'var(--text-dim)', letterSpacing: '0.02em',
             margin: '0 0 0.75rem',
           }}>
-            Understand Value.
+            Complex products. Simple stories.
             <span style={{ color: 'var(--acid-lime)', marginLeft: '0.5rem' }}>
-              Deliver better positioning and messaging.
+              Reps who actually tell them.
             </span>
           </p>
 
@@ -118,7 +118,7 @@ export default function Home() {
             color: 'var(--text-dim)', maxWidth: '64ch',
             margin: '0 0 2.5rem',
           }}>
-            I'm a product marketing leader with 15+ years in B2B SaaS and Martech, currently seeking my next opportunity.
+            When Oracle wanted to launch a 'data-generating pervasive web tag', I wrote a story about reacting to customers as they engaged. Infinity Streams became the rapid-retargeting choice for Responsys customers.
           </p>
 
           <p style={{
@@ -126,7 +126,7 @@ export default function Home() {
             color: 'var(--text-dim)', maxWidth: '64ch',
             margin: '0 0 2.5rem',
           }}>
-            This site is an AI-assisted portfolio showcasing my technical, professional, and creative skills.
+            When Apple launched Mail Privacy Protection and ruined 'open data', I sat down with product and deliverability to develop the 'Projected Open Rate'. Our story taught our customers how to improve email delivery rates while establishing Marigold as the leader in Deliverability.
           </p>
 
           <p style={{
@@ -134,7 +134,7 @@ export default function Home() {
             color: 'var(--text-dim)', maxWidth: '64ch',
             margin: '0 0 2.5rem',
           }}>
-            There's a thread running through everything here: creative thinking in service of a strategy. The ART page shows it literally: a progression from digital photography to acrylic painting. The ABOUT page tells the professional story behind it, with work samples. The APP page hosts an AI-powered research tool that builds competitive battlecards. I'd love to walk you through it.
+            I help by finding the right problem and writing a story that makes the customer the champion. This site is my living professional portfolio, built with Claude, written in my own words.
           </p>
 
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
@@ -150,7 +150,7 @@ export default function Home() {
               onMouseEnter={e => { e.currentTarget.style.background = 'var(--sapphire)'; e.currentTarget.style.color = 'var(--bg)' }}
               onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text)' }}
             >
-              Learn more →
+              The story →
             </a>
             <a href="/app" style={{
               display: 'inline-flex', alignItems: 'center', gap: '0.7rem',
@@ -164,9 +164,42 @@ export default function Home() {
               onMouseEnter={e => { e.currentTarget.style.background = 'var(--acid-lime)'; e.currentTarget.style.color = 'var(--bg)' }}
               onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--acid-lime)' }}
             >
-              See the work →
+              See BattleBot →
             </a>
           </div>
+        </div>
+
+        {/* Value cards */}
+        <div style={{
+          marginTop: 'clamp(2rem, 4vw, 3rem)',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+          gap: '1.5rem',
+          borderTop: '1px solid rgba(75,101,132,0.25)',
+          paddingTop: '3rem',
+        }}>
+          {[
+            { n: '01', title: 'Reps win more, sooner',        body: 'Simplified messaging about solving problems. Stories reps can tell.' },
+            { n: '02', title: 'More output, same headcount', body: 'Shorter cycles, better results, AI workflows that everyone can trust.' },
+            { n: '03', title: 'A stronger team',             body: 'Ramps fast. Finds and closes the gaps. Elevates through collaboration.' },
+          ].map(({ n, title, body }) => (
+            <div key={n} style={{
+              padding: '1.5rem', background: 'var(--bg-raised)',
+              border: '1px solid var(--border)',
+              borderTop: '2px solid var(--acid-lime)',
+            }}>
+              <div style={{
+                fontFamily: 'JetBrains Mono', fontSize: '0.7rem',
+                color: 'var(--text-dim)', marginBottom: '0.6rem',
+              }}>{n}</div>
+              <div style={{
+                fontFamily: 'Josefin Sans', fontSize: '1rem',
+                fontWeight: 500, letterSpacing: '0.06em', marginBottom: '0.7rem',
+                textTransform: 'uppercase', color: 'var(--text)',
+              }}>{title}</div>
+              <p style={{ fontSize: '0.9rem', lineHeight: 1.65, color: 'var(--text-dim)', margin: 0 }}>{body}</p>
+            </div>
+          ))}
         </div>
 
         {/* Proof card */}
@@ -179,17 +212,18 @@ export default function Home() {
           paddingTop: '3rem',
         }}>
           {[
-            { value: '15+', label: 'Years in B2B SaaS' },
-            { value: '#1',  label: "Google keyword rank for 'campaign management'" },
-            { value: '8×',  label: 'Analyst inquiry growth' },
-            { value: '4×',  label: 'Briefing growth' },
+            { value: '15+',               label: 'Years in B2B SaaS' },
+            { value: '#1',                label: 'On Google for "Campaign Management"' },
+            { value: 'Industry standard', label: 'Projected Open Rate. Braze followed.' },
+            { value: '8× / 4×',           label: 'Analyst inquiry growth / briefing growth' },
           ].map(({ value, label }) => (
             <div key={label}>
               <div style={{
                 fontFamily: 'Josefin Sans', fontWeight: 200,
-                fontSize: 'clamp(2rem, 4vw, 3rem)',
+                fontSize: value.length > 8 ? 'clamp(1.4rem, 2.4vw, 1.9rem)' : 'clamp(2rem, 4vw, 3rem)',
                 color: 'var(--acid-lime)', letterSpacing: '-0.01em',
-                lineHeight: 1,
+                lineHeight: 1, minHeight: 'clamp(2rem, 4vw, 3rem)',
+                display: 'flex', alignItems: 'flex-end',
               }}>{value}</div>
               <div style={{
                 marginTop: '0.5rem', fontSize: '0.85rem',
@@ -210,7 +244,7 @@ export default function Home() {
           <div>
             <div className="eyebrow" style={{ marginBottom: '1.25rem' }}>Operating ground</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
-              {['B2B SaaS', 'AI & ML GTM', 'Analyst Relations', 'Sales Enablement', 'Positioning'].map(tag => (
+              {['Go-to-Market Strategy', 'Positioning and Messaging', 'Sales Enablement', 'Analyst Relations', 'AI & Martech'].map(tag => (
                 <span key={tag} style={{
                   fontFamily: 'Josefin Sans', textTransform: 'uppercase',
                   letterSpacing: '0.16em', fontSize: '0.72rem',
@@ -225,8 +259,8 @@ export default function Home() {
             {[
               { label: 'Currently',  value: 'Open to Director and Senior PMM roles. Remote.' },
               { label: 'Expertise',  value: 'Enterprise SaaS, AI, Martech, Customer Experience (CX)' },
-              { label: 'Building',   value: 'BattleBot — competitive battlecard agent' },
-              { label: 'Service',    value: 'USAF veteran · Weather Forecaster' },
+              { label: 'Building',   value: 'BattleBot. Battlecards reps can trust, built in minutes.' },
+              { label: 'Service',    value: 'USAF Veteran · Weather Forecaster' },
             ].map(({ label, value }) => (
               <div key={label}>
                 <div className="eyebrow" style={{ marginBottom: '0.4rem' }}>{label}</div>
